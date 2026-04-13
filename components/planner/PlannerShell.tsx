@@ -1,7 +1,8 @@
 "use client";
 
-import { AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { FormEvent, useCallback, useState } from "react";
+import { EASE_APPLE } from "@/lib/motion-premium";
 import { toast } from "sonner";
 import FloatingCta from "@/components/planner/FloatingCta";
 import InputForm, { type InputFormData } from "@/components/planner/InputForm";
@@ -238,55 +239,81 @@ export default function PlannerShell() {
         ) : null}
       </AnimatePresence>
 
-      {generatedPlan && !isLoading ? (
-        <div className="animate-fade-in-up pt-2">
-          <PlanOutput result={generatedPlan} />
-        </div>
-      ) : null}
+      <AnimatePresence mode="wait">
+        {generatedPlan && !isLoading ? (
+          <motion.div
+            key="plan-output"
+            layout
+            initial={{ opacity: 0, y: 28 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -12 }}
+            transition={{ duration: 0.5, ease: EASE_APPLE }}
+            className="pt-2"
+          >
+            <PlanOutput result={generatedPlan} />
+          </motion.div>
+        ) : null}
+      </AnimatePresence>
 
       <FloatingCta onClick={scrollToForm} />
 
-      {showUpgradeModal ? (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-stone-950/55 p-4 backdrop-blur-sm">
-          <div
-            className="relative w-full max-w-md overflow-hidden rounded-[1.75rem] border border-white/20 bg-white p-8 shadow-2xl"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="upgrade-title"
+      <AnimatePresence>
+        {showUpgradeModal ? (
+          <motion.div
+            key="upgrade-backdrop"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-stone-950/55 p-4 backdrop-blur-sm"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.35, ease: EASE_APPLE }}
+            onClick={() => setShowUpgradeModal(false)}
+            role="presentation"
           >
-            <div
-              className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-[#FF6B35] via-[#ff8f66] to-[#ffb347]"
-              aria-hidden
-            />
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#FF6B35]">Premium</p>
-            <h3 id="upgrade-title" className="mt-2 text-2xl font-semibold tracking-tight text-stone-900">
-              Daily free limit reached
-            </h3>
-            <p className="mt-3 text-sm leading-relaxed text-stone-600">
-              Unlock another AI-generated plan whenever inspiration strikes.
-            </p>
-            <p className="mt-2 text-lg font-semibold text-stone-900">₹99 per plan</p>
+            <motion.div
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="upgrade-title"
+              className="relative w-full max-w-md overflow-hidden rounded-[1.75rem] border border-white/20 bg-white p-8 shadow-2xl"
+              initial={{ opacity: 0, y: 24, scale: 0.97 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 16, scale: 0.98 }}
+              transition={{ duration: 0.35, ease: EASE_APPLE }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div
+                className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-[#FF6B35] via-[#ff8f66] to-[#ffb347]"
+                aria-hidden
+              />
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#FF6B35]">Premium</p>
+              <h3 id="upgrade-title" className="mt-2 text-2xl font-semibold tracking-tight text-stone-900">
+                Daily free limit reached
+              </h3>
+              <p className="mt-3 text-sm leading-relaxed text-stone-600">
+                Unlock another AI-generated plan whenever inspiration strikes.
+              </p>
+              <p className="mt-2 text-lg font-semibold text-stone-900">₹99 per plan</p>
 
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <button
-                type="button"
-                onClick={() => setShowUpgradeModal(false)}
-                className="w-full rounded-2xl border border-stone-200 bg-white px-4 py-3 text-sm font-semibold text-stone-600 transition hover:bg-stone-50"
-              >
-                Maybe later
-              </button>
-              <button
-                type="button"
-                onClick={handleUpgrade}
-                disabled={isPaying}
-                className="w-full rounded-2xl bg-gradient-to-r from-stone-900 to-stone-800 px-4 py-3 text-sm font-semibold text-white shadow-lg transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                {isPaying ? "Opening…" : "Pay with Razorpay"}
-              </button>
-            </div>
-          </div>
-        </div>
-      ) : null}
+              <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+                <button
+                  type="button"
+                  onClick={() => setShowUpgradeModal(false)}
+                  className="w-full rounded-2xl border border-stone-200 bg-white px-4 py-3 text-sm font-semibold text-stone-600 transition hover:bg-stone-50"
+                >
+                  Maybe later
+                </button>
+                <button
+                  type="button"
+                  onClick={handleUpgrade}
+                  disabled={isPaying}
+                  className="w-full rounded-2xl bg-gradient-to-r from-stone-900 to-stone-800 px-4 py-3 text-sm font-semibold text-white shadow-lg transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {isPaying ? "Opening…" : "Pay with Razorpay"}
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        ) : null}
+      </AnimatePresence>
     </div>
   );
 }

@@ -1,15 +1,16 @@
 "use client";
 
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
 import Image from "next/image";
 import { useRef } from "react";
+import { EASE_APPLE } from "@/lib/motion-premium";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 16 },
   visible: (i: number) => ({
     opacity: 1,
     y: 0,
-    transition: { delay: 0.06 * i, duration: 0.5, ease: [0.22, 1, 0.36, 1] as const },
+    transition: { delay: 0.06 * i, duration: 0.52, ease: [0.22, 1, 0.36, 1] as const },
   }),
 };
 
@@ -19,11 +20,12 @@ type HeroSectionProps = {
 
 export default function HeroSection({ className = "" }: HeroSectionProps) {
   const sectionRef = useRef<HTMLElement>(null);
+  const reduceMotion = useReducedMotion();
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ["start start", "end start"],
   });
-  const imageY = useTransform(scrollYProgress, [0, 1], ["0%", "8%"]);
+  const imageY = useTransform(scrollYProgress, [0, 1], reduceMotion ? ["0%", "0%"] : ["0%", "8%"]);
   const overlayOpacity = useTransform(scrollYProgress, [0, 0.6], [0.55, 0.72]);
 
   return (
@@ -36,14 +38,21 @@ export default function HeroSection({ className = "" }: HeroSectionProps) {
         style={{ y: imageY }}
         className="relative min-h-[200px] w-full flex-1 lg:min-h-0"
       >
-        <Image
-          src="https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=1600&q=80"
-          alt=""
-          fill
-          priority
-          sizes="(max-width: 1024px) 100vw, 42vw"
-          className="object-cover object-center"
-        />
+        <motion.div
+          className="absolute inset-0"
+          initial={reduceMotion ? false : { scale: 1.04 }}
+          animate={reduceMotion ? undefined : { scale: 1 }}
+          transition={{ duration: 1.1, ease: EASE_APPLE }}
+        >
+          <Image
+            src="https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=1600&q=80"
+            alt=""
+            fill
+            priority
+            sizes="(max-width: 1024px) 100vw, 42vw"
+            className="object-cover object-center"
+          />
+        </motion.div>
         <motion.div
           style={{ opacity: overlayOpacity }}
           className="absolute inset-0 bg-gradient-to-t from-stone-950 via-stone-900/45 to-stone-900/30"
@@ -53,7 +62,6 @@ export default function HeroSection({ className = "" }: HeroSectionProps) {
           className="absolute inset-0 bg-gradient-to-br from-[#FF6B35]/20 via-transparent to-stone-950/45 mix-blend-soft-light"
           aria-hidden
         />
-        {/* Stronger bottom band for text contrast (a11y) */}
         <div
           className="absolute inset-x-0 bottom-0 h-[55%] bg-gradient-to-t from-stone-950/90 via-stone-950/50 to-transparent"
           aria-hidden

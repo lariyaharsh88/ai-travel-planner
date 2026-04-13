@@ -1,11 +1,81 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { Compass } from "lucide-react";
 import Link from "next/link";
 import { EASE_APPLE } from "@/lib/motion-premium";
 
+const navList = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.06, delayChildren: 0.35 },
+  },
+};
+
+const navItem = {
+  hidden: { opacity: 0, y: 6 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: EASE_APPLE } },
+};
+
+const links = [
+  { href: "#planner-form", label: "Plan" },
+  { href: "#how-it-works", label: "How it works" },
+] as const;
+
+function NavLinks({ animated }: { animated: boolean }) {
+  const linkClass =
+    "group relative rounded-full px-4 py-2 text-sm font-medium text-stone-600";
+
+  if (!animated) {
+    return (
+      <>
+        {links.map(({ href, label }) => (
+          <a key={href} href={href} className={linkClass}>
+            <span className="relative z-10 transition-colors duration-300 group-hover:text-stone-900">{label}</span>
+            <span
+              className="absolute inset-0 rounded-full bg-white/0 transition-colors duration-300 ease-out group-hover:bg-white/75"
+              aria-hidden
+            />
+            <span
+              className="absolute inset-x-4 bottom-2 z-[1] h-[2px] origin-center scale-x-0 rounded-full bg-gradient-to-r from-transparent via-[#FF6B35]/90 to-transparent transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-x-100"
+              aria-hidden
+            />
+          </a>
+        ))}
+      </>
+    );
+  }
+
+  return (
+    <>
+      {links.map(({ href, label }) => (
+        <motion.a
+          key={href}
+          href={href}
+          variants={navItem}
+          whileHover={{ y: -1 }}
+          transition={{ duration: 0.35, ease: EASE_APPLE }}
+          className={linkClass}
+        >
+          <span className="relative z-10 transition-colors duration-300 group-hover:text-stone-900">{label}</span>
+          <span
+            className="absolute inset-0 rounded-full bg-white/0 transition-colors duration-300 ease-out group-hover:bg-white/75"
+            aria-hidden
+          />
+          <span
+            className="absolute inset-x-4 bottom-2 z-[1] h-[2px] origin-center scale-x-0 rounded-full bg-gradient-to-r from-transparent via-[#FF6B35]/90 to-transparent transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-x-100"
+            aria-hidden
+          />
+        </motion.a>
+      ))}
+    </>
+  );
+}
+
 export default function Navbar() {
+  const reduce = useReducedMotion();
+
   return (
     <motion.header
       initial={{ y: -12, opacity: 0 }}
@@ -28,32 +98,21 @@ export default function Navbar() {
             </span>
           </span>
         </Link>
-        <nav className="hidden items-center gap-0.5 sm:flex" aria-label="Primary">
-          {(
-            [
-              { href: "#planner-form", label: "Plan" },
-              { href: "#how-it-works", label: "How it works" },
-            ] as const
-          ).map(({ href, label }) => (
-            <motion.a
-              key={href}
-              href={href}
-              whileHover={{ y: -1 }}
-              transition={{ duration: 0.35, ease: EASE_APPLE }}
-              className="group relative rounded-full px-4 py-2 text-sm font-medium text-stone-600"
-            >
-              <span className="relative z-10 transition-colors duration-300 group-hover:text-stone-900">{label}</span>
-              <span
-                className="absolute inset-0 rounded-full bg-white/0 transition-colors duration-300 ease-out group-hover:bg-white/75"
-                aria-hidden
-              />
-              <span
-                className="absolute inset-x-4 bottom-2 z-[1] h-[2px] origin-center scale-x-0 rounded-full bg-gradient-to-r from-transparent via-[#FF6B35]/90 to-transparent transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-x-100"
-                aria-hidden
-              />
-            </motion.a>
-          ))}
-        </nav>
+        {reduce ? (
+          <nav className="hidden items-center gap-0.5 sm:flex" aria-label="Primary">
+            <NavLinks animated={false} />
+          </nav>
+        ) : (
+          <motion.nav
+            className="hidden items-center gap-0.5 sm:flex"
+            aria-label="Primary"
+            variants={navList}
+            initial="hidden"
+            animate="visible"
+          >
+            <NavLinks animated />
+          </motion.nav>
+        )}
       </div>
     </motion.header>
   );
