@@ -26,6 +26,7 @@ cp .env.example .env.local
 
 ```env
 GEMINI_API_KEY=your_gemini_api_key_here
+GEMINI_MODEL=gemini-2.0-flash
 NEXT_PUBLIC_RAZORPAY_KEY_ID=your_razorpay_key_id_here
 ```
 

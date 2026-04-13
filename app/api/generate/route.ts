@@ -129,31 +129,53 @@ Return ONLY valid JSON with this exact shape:
 }
 `.trim();
 
-    const geminiResponse = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          contents: [
-            {
-              role: "user",
-              parts: [{ text: prompt }],
-            },
-          ],
-          generationConfig: {
-            responseMimeType: "application/json",
-          },
-        }),
-      },
-    );
+    const preferredModel = process.env.GEMINI_MODEL ?? "gemini-2.0-flash";
+    const fallbackModels = ["gemini-2.0-flash", "gemini-1.5-flash-latest"];
+    const modelsToTry = Array.from(new Set([preferredModel, ...fallbackModels]));
 
-    if (!geminiResponse.ok) {
-      const errorText = await geminiResponse.text();
+    let geminiResponse: Response | null = null;
+    let lastErrorText = "";
+
+    for (const model of modelsToTry) {
+      const response = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            contents: [
+              {
+                role: "user",
+                parts: [{ text: prompt }],
+              },
+            ],
+            generationConfig: {
+              responseMimeType: "application/json",
+            },
+          }),
+        },
+      );
+
+      if (response.ok) {
+        geminiResponse = response;
+        break;
+      }
+
+      const errorText = await response.text();
+      lastErrorText = errorText;
+      if (response.status !== 404) {
+        return NextResponse.json(
+          { error: "Gemini request failed.", details: errorText },
+          { status: 502 },
+        );
+      }
+    }
+
+    if (!geminiResponse) {
       return NextResponse.json(
-        { error: "Gemini request failed.", details: errorText },
+        { error: "Gemini request failed.", details: lastErrorText },
         { status: 502 },
       );
     }
