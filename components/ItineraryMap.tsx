@@ -117,8 +117,8 @@ export default function ItineraryMap({ places }: ItineraryMapProps) {
     coordinates.length > 0 ? [coordinates[0].lat, coordinates[0].lon] : defaultCenter;
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-[#0c1829]/12 shadow-inner">
-      <div className="h-64 w-full sm:h-80">
+    <div className="overflow-hidden rounded-xl border border-[#0c1829]/12 shadow-inner">
+      <div className="h-52 w-full sm:h-60">
         <MapContainer center={center} zoom={coordinates.length > 0 ? 5 : 3} className="h-full w-full">
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'

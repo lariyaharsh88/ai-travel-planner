@@ -1,10 +1,12 @@
 "use client";
 
 import { FormEvent, useState } from "react";
+import BudgetDaysControls from "@/components/BudgetDaysControls";
+import DestinationCombobox from "@/components/DestinationCombobox";
 import TravelResults from "@/components/TravelResults";
+import TravelStyleSelect, { type TravelStyleValue } from "@/components/TravelStyleSelect";
 import { TravelPlanResponse } from "@/lib/travel-plan";
 
-const travelStyles = ["budget", "luxury", "solo", "couple", "adventure"] as const;
 const interestsList = [
   "food",
   "hidden places",
@@ -13,7 +15,7 @@ const interestsList = [
   "temples",
 ] as const;
 
-type TravelStyle = (typeof travelStyles)[number];
+type TravelStyle = TravelStyleValue;
 type Interest = (typeof interestsList)[number];
 
 type TravelFormData = {
@@ -102,9 +104,6 @@ function saveUsageState(nextState: UsageState) {
 function canGenerate(state: UsageState) {
   return state.freeUsed < DAILY_FREE_LIMIT || state.paidCredits > 0;
 }
-
-const inputClass =
-  "w-full rounded-xl border border-[#0c1829]/12 bg-white/90 px-4 py-3 text-sm text-[#0c1829] shadow-inner outline-none transition placeholder:text-[#94a3b8] focus:border-[#c9a227]/60 focus:ring-2 focus:ring-[#c9a227]/25";
 
 const labelClass = "mb-2 block text-xs font-semibold uppercase tracking-wider text-[#475569]";
 
@@ -241,105 +240,55 @@ export default function TravelPlanningForm() {
   };
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-6">
       <form
         onSubmit={handleSubmit}
-        className="relative mx-auto w-full max-w-xl overflow-hidden rounded-3xl border border-[#0c1829]/10 bg-white/85 p-6 shadow-[0_25px_60px_-15px_rgba(12,24,41,0.18)] backdrop-blur-md sm:p-8"
+        className="relative mx-auto w-full max-w-xl overflow-hidden rounded-2xl border border-[#0c1829]/10 bg-white/85 p-5 shadow-[0_18px_40px_-12px_rgba(12,24,41,0.14)] backdrop-blur-md sm:p-6"
       >
         <div
           className="pointer-events-none absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-[#1e3a5f] via-[#c9a227] to-[#e8a87c]"
           aria-hidden
         />
-        <div className="mb-2 flex items-baseline justify-between gap-2">
-          <h2 className="font-[family-name:var(--font-playfair)] text-2xl font-semibold text-[#0c1829]">
+        <div className="mb-1 flex items-baseline justify-between gap-2">
+          <h2 className="font-[family-name:var(--font-playfair)] text-xl font-semibold text-[#0c1829] sm:text-2xl">
             Plan your trip
           </h2>
-          <span className="text-xs font-medium text-[#64748b]">1 free plan / day</span>
+          <span className="text-[10px] font-medium text-[#64748b] sm:text-xs">1 free / day</span>
         </div>
-        <p className="mb-8 text-sm leading-relaxed text-[#64748b]">
-          Fill in the details below. We will generate a full itinerary you can explore on the map
-          and export as PDF.
+        <p className="mb-5 text-xs leading-relaxed text-[#64748b] sm:text-sm">
+          Details below → full itinerary, map, and PDF export.
         </p>
 
-        <div className="space-y-6">
+        <div className="space-y-4">
           <div>
             <label htmlFor="destination" className={labelClass}>
-              Destination
+              Where to?
             </label>
-            <input
+            <DestinationCombobox
               id="destination"
-              type="text"
               value={formData.destination}
-              onChange={(event) =>
-                setFormData((prev) => ({ ...prev, destination: event.target.value }))
-              }
-              placeholder="e.g. Kyoto, Lisbon, Bali"
-              className={inputClass}
+              onChange={(destination) => setFormData((prev) => ({ ...prev, destination }))}
               required
             />
+            <p className="mt-1.5 text-[10px] text-[#94a3b8] sm:text-xs">
+              Search popular places or type your own.
+            </p>
           </div>
 
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <div>
-              <label htmlFor="budget" className={labelClass}>
-                Budget
-              </label>
-              <input
-                id="budget"
-                type="number"
-                min={0}
-                value={formData.budget}
-                onChange={(event) =>
-                  setFormData((prev) => ({ ...prev, budget: Number(event.target.value) }))
-                }
-                className={inputClass}
-                required
-              />
-            </div>
+          <BudgetDaysControls
+            budget={formData.budget}
+            days={formData.days}
+            onBudgetChange={(budget) => setFormData((prev) => ({ ...prev, budget }))}
+            onDaysChange={(days) => setFormData((prev) => ({ ...prev, days }))}
+          />
 
-            <div>
-              <label htmlFor="days" className={labelClass}>
-                Number of days
-              </label>
-              <input
-                id="days"
-                type="number"
-                min={1}
-                value={formData.days}
-                onChange={(event) =>
-                  setFormData((prev) => ({ ...prev, days: Number(event.target.value) }))
-                }
-                className={inputClass}
-                required
-              />
-            </div>
-          </div>
-
-          <div>
-            <label htmlFor="travelStyle" className={labelClass}>
-              Travel style
-            </label>
-            <select
-              id="travelStyle"
+          <fieldset>
+            <legend className={labelClass}>Travel style</legend>
+            <TravelStyleSelect
               value={formData.travelStyle}
-              onChange={(event) =>
-                setFormData((prev) => ({
-                  ...prev,
-                  travelStyle: event.target.value as TravelStyle,
-                }))
-              }
-              className={`${inputClass} cursor-pointer appearance-none bg-[length:1rem] bg-[right_0.75rem_center] bg-no-repeat pr-10`}
-              style={{
-                backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23475569'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E")`,
-              }}
-            >
-              {travelStyles.map((style) => (
-                <option key={style} value={style}>
-                  {style}
-                </option>
-              ))}
-            </select>
-          </div>
+              onChange={(travelStyle) => setFormData((prev) => ({ ...prev, travelStyle }))}
+            />
+          </fieldset>
 
           <fieldset>
             <legend className={labelClass}>Interests</legend>
@@ -349,7 +298,7 @@ export default function TravelPlanningForm() {
                 return (
                   <label
                     key={interest}
-                    className={`group flex cursor-pointer items-center gap-3 rounded-xl border px-3.5 py-2.5 text-sm font-medium transition ${
+                    className={`group flex cursor-pointer items-center gap-2 rounded-lg border px-3 py-2 text-xs font-medium transition sm:text-sm ${
                       checked
                         ? "border-[#c9a227]/50 bg-[#c9a227]/10 text-[#0c1829] shadow-sm"
                         : "border-[#0c1829]/10 bg-white/60 text-[#475569] hover:border-[#c9a227]/35"
@@ -378,7 +327,7 @@ export default function TravelPlanningForm() {
         <button
           type="submit"
           disabled={isLoading}
-          className="mt-8 w-full rounded-xl bg-gradient-to-r from-[#0c1829] via-[#1e3a5f] to-[#1e3a5f] px-4 py-3.5 text-base font-semibold text-white shadow-lg shadow-[#0c1829]/25 transition hover:brightness-110 hover:shadow-xl disabled:cursor-not-allowed disabled:opacity-60"
+          className="mt-6 w-full rounded-xl bg-gradient-to-r from-[#0c1829] via-[#1e3a5f] to-[#1e3a5f] px-4 py-3 text-sm font-semibold text-white shadow-md shadow-[#0c1829]/20 transition hover:brightness-110 hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-60 sm:text-base"
         >
           {isLoading ? (
             <span className="inline-flex items-center justify-center gap-2">
@@ -392,7 +341,7 @@ export default function TravelPlanningForm() {
       </form>
 
       {generatedPlan ? (
-        <div className="animate-fade-in-up mx-auto max-w-3xl pt-2">
+        <div className="animate-fade-in-up mx-auto max-w-3xl pt-1">
           <TravelResults result={generatedPlan} />
         </div>
       ) : null}

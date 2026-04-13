@@ -11,7 +11,7 @@ type TravelResultsProps = {
 };
 
 const sectionShell =
-  "relative overflow-hidden rounded-3xl border border-[#0c1829]/10 bg-white/90 p-6 shadow-[0_20px_50px_-20px_rgba(12,24,41,0.15)] backdrop-blur-sm sm:p-8";
+  "relative overflow-hidden rounded-2xl border border-[#0c1829]/10 bg-white/90 p-4 shadow-[0_14px_36px_-14px_rgba(12,24,41,0.12)] backdrop-blur-sm sm:p-5";
 
 const sectionAccent = (
   <div
@@ -43,18 +43,18 @@ export default function TravelResults({ result }: TravelResultsProps) {
   };
 
   return (
-    <section className="w-full max-w-3xl space-y-8 text-left">
-      <div className="flex flex-col items-stretch justify-between gap-4 sm:flex-row sm:items-center">
+    <section className="w-full max-w-3xl space-y-5 text-left">
+      <div className="flex flex-col items-stretch justify-between gap-3 sm:flex-row sm:items-center">
         <div>
-          <h2 className="font-[family-name:var(--font-playfair)] text-2xl font-semibold text-[#0c1829] sm:text-3xl">
+          <h2 className="font-[family-name:var(--font-playfair)] text-xl font-semibold text-[#0c1829] sm:text-2xl">
             Your trip
           </h2>
-          <p className="mt-1 text-sm text-[#64748b]">Map, itinerary, budget, and content in one place.</p>
+          <p className="mt-0.5 text-xs text-[#64748b] sm:text-sm">Map, itinerary, budget, content.</p>
         </div>
         <PDFDownloadLink
           document={<ItineraryPdfDocument result={result} />}
           fileName="ai-travel-itinerary.pdf"
-          className="inline-flex items-center justify-center rounded-xl border border-[#0c1829]/12 bg-white px-5 py-2.5 text-sm font-semibold text-[#0c1829] shadow-sm transition hover:border-[#c9a227]/35 hover:bg-[#f8f6f3]"
+          className="inline-flex items-center justify-center rounded-lg border border-[#0c1829]/12 bg-white px-4 py-2 text-xs font-semibold text-[#0c1829] shadow-sm transition hover:border-[#c9a227]/35 hover:bg-[#f8f6f3] sm:text-sm"
         >
           {({ loading }) => (loading ? "Preparing PDF…" : "Download PDF")}
         </PDFDownloadLink>
@@ -63,11 +63,11 @@ export default function TravelResults({ result }: TravelResultsProps) {
       <div className={sectionShell}>
         {sectionAccent}
         <div className="relative">
-          <div className="mb-4 flex items-center gap-2">
-            <span className="text-xl" aria-hidden>
+          <div className="mb-3 flex items-center gap-2">
+            <span className="text-lg" aria-hidden>
               🗺️
             </span>
-            <h3 className="font-[family-name:var(--font-playfair)] text-xl font-semibold text-[#0c1829]">
+            <h3 className="font-[family-name:var(--font-playfair)] text-lg font-semibold text-[#0c1829]">
               Itinerary map
             </h3>
           </div>
@@ -78,19 +78,19 @@ export default function TravelResults({ result }: TravelResultsProps) {
       <div className={sectionShell}>
         {sectionAccent}
         <div className="relative">
-          <div className="mb-4 flex items-center gap-2">
-            <span className="text-xl" aria-hidden>
+          <div className="mb-3 flex items-center gap-2">
+            <span className="text-lg" aria-hidden>
               ✈️
             </span>
-            <h3 className="font-[family-name:var(--font-playfair)] text-xl font-semibold text-[#0c1829]">
+            <h3 className="font-[family-name:var(--font-playfair)] text-lg font-semibold text-[#0c1829]">
               Day-by-day itinerary
             </h3>
           </div>
-          <div className="grid grid-cols-1 gap-4">
+          <div className="grid grid-cols-1 gap-3">
             {result.dayWisePlan.map((dayPlan) => (
               <article
                 key={dayPlan.day}
-                className="relative overflow-hidden rounded-2xl border border-[#0c1829]/8 bg-gradient-to-br from-[#f8f6f3] to-white p-5 shadow-sm"
+                className="relative overflow-hidden rounded-xl border border-[#0c1829]/8 bg-gradient-to-br from-[#f8f6f3] to-white p-4 shadow-sm"
               >
                 <div
                   className="absolute left-0 top-0 h-full w-1 rounded-l-2xl bg-gradient-to-b from-[#1e3a5f] via-[#c9a227] to-[#e8a87c]"
@@ -135,15 +135,15 @@ export default function TravelResults({ result }: TravelResultsProps) {
       <div className={sectionShell}>
         {sectionAccent}
         <div className="relative">
-          <div className="mb-4 flex items-center gap-2">
-            <span className="text-xl" aria-hidden>
+          <div className="mb-3 flex items-center gap-2">
+            <span className="text-lg" aria-hidden>
               💰
             </span>
-            <h3 className="font-[family-name:var(--font-playfair)] text-xl font-semibold text-[#0c1829]">
+            <h3 className="font-[family-name:var(--font-playfair)] text-lg font-semibold text-[#0c1829]">
               Budget breakdown
             </h3>
           </div>
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
             {(
               [
                 ["Stay", result.budgetBreakdown.stay],
@@ -153,7 +153,7 @@ export default function TravelResults({ result }: TravelResultsProps) {
             ).map(([label, value]) => (
               <div
                 key={label}
-                className="rounded-2xl border border-[#0c1829]/8 bg-gradient-to-br from-white to-[#f8f6f3] p-4 shadow-sm"
+                className="rounded-xl border border-[#0c1829]/8 bg-gradient-to-br from-white to-[#f8f6f3] p-3 shadow-sm"
               >
                 <p className="text-xs font-semibold uppercase tracking-wider text-[#64748b]">{label}</p>
                 <p className="mt-2 font-[family-name:var(--font-playfair)] text-lg font-semibold text-[#0c1829]">
@@ -168,19 +168,19 @@ export default function TravelResults({ result }: TravelResultsProps) {
       <div className={sectionShell}>
         {sectionAccent}
         <div className="relative">
-          <div className="mb-4 flex items-center gap-2">
-            <span className="text-xl" aria-hidden>
+          <div className="mb-3 flex items-center gap-2">
+            <span className="text-lg" aria-hidden>
               🎬
             </span>
-            <h3 className="font-[family-name:var(--font-playfair)] text-xl font-semibold text-[#0c1829]">
+            <h3 className="font-[family-name:var(--font-playfair)] text-lg font-semibold text-[#0c1829]">
               Reel ideas
             </h3>
           </div>
-          <div className="space-y-4">
+          <div className="space-y-3">
             {result.reelIdeas.map((idea, index) => (
               <article
                 key={`${idea.hook}-${index}`}
-                className="rounded-2xl border border-[#0c1829]/8 bg-[#faf8f5] p-5 shadow-sm"
+                className="rounded-xl border border-[#0c1829]/8 bg-[#faf8f5] p-4 shadow-sm"
               >
                 <p className="font-medium text-[#0c1829]">{idea.hook}</p>
                 <p className="mt-2 text-sm leading-relaxed text-[#475569]">{idea.caption}</p>
@@ -201,19 +201,19 @@ export default function TravelResults({ result }: TravelResultsProps) {
       <div className={sectionShell}>
         {sectionAccent}
         <div className="relative">
-          <div className="mb-4 flex items-center gap-2">
-            <span className="text-xl" aria-hidden>
+          <div className="mb-3 flex items-center gap-2">
+            <span className="text-lg" aria-hidden>
               ✍️
             </span>
-            <h3 className="font-[family-name:var(--font-playfair)] text-xl font-semibold text-[#0c1829]">
+            <h3 className="font-[family-name:var(--font-playfair)] text-lg font-semibold text-[#0c1829]">
               Blog preview
             </h3>
           </div>
-          <article className="rounded-2xl border border-[#0c1829]/8 bg-gradient-to-br from-[#f8f6f3] to-white p-5">
-            <h4 className="font-[family-name:var(--font-playfair)] text-lg font-semibold text-[#0c1829]">
+          <article className="rounded-xl border border-[#0c1829]/8 bg-gradient-to-br from-[#f8f6f3] to-white p-4">
+            <h4 className="font-[family-name:var(--font-playfair)] text-base font-semibold text-[#0c1829] sm:text-lg">
               {result.blogContent.title}
             </h4>
-            <div className="mt-4 max-h-52 overflow-y-auto rounded-xl border border-[#0c1829]/10 bg-white/80 p-4 text-sm leading-relaxed text-[#475569] shadow-inner">
+            <div className="mt-3 max-h-44 overflow-y-auto rounded-lg border border-[#0c1829]/10 bg-white/80 p-3 text-xs leading-relaxed text-[#475569] shadow-inner sm:text-sm">
               {result.blogContent.preview}
             </div>
           </article>
