@@ -103,6 +103,11 @@ function canGenerate(state: UsageState) {
   return state.freeUsed < DAILY_FREE_LIMIT || state.paidCredits > 0;
 }
 
+const inputClass =
+  "w-full rounded-xl border border-[#0c1829]/12 bg-white/90 px-4 py-3 text-sm text-[#0c1829] shadow-inner outline-none transition placeholder:text-[#94a3b8] focus:border-[#c9a227]/60 focus:ring-2 focus:ring-[#c9a227]/25";
+
+const labelClass = "mb-2 block text-xs font-semibold uppercase tracking-wider text-[#475569]";
+
 export default function TravelPlanningForm() {
   const [formData, setFormData] = useState<TravelFormData>({
     destination: "",
@@ -226,7 +231,7 @@ export default function TravelPlanningForm() {
         console.log("Razorpay payment success:", response.razorpay_payment_id);
       },
       theme: {
-        color: "#111827",
+        color: "#0c1829",
       },
     };
 
@@ -236,14 +241,29 @@ export default function TravelPlanningForm() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-10">
       <form
         onSubmit={handleSubmit}
-        className="w-full max-w-xl rounded-2xl border border-black/10 bg-white p-5 shadow-sm sm:p-8"
+        className="relative mx-auto w-full max-w-xl overflow-hidden rounded-3xl border border-[#0c1829]/10 bg-white/85 p-6 shadow-[0_25px_60px_-15px_rgba(12,24,41,0.18)] backdrop-blur-md sm:p-8"
       >
-        <div className="space-y-5">
+        <div
+          className="pointer-events-none absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-[#1e3a5f] via-[#c9a227] to-[#e8a87c]"
+          aria-hidden
+        />
+        <div className="mb-2 flex items-baseline justify-between gap-2">
+          <h2 className="font-[family-name:var(--font-playfair)] text-2xl font-semibold text-[#0c1829]">
+            Plan your trip
+          </h2>
+          <span className="text-xs font-medium text-[#64748b]">1 free plan / day</span>
+        </div>
+        <p className="mb-8 text-sm leading-relaxed text-[#64748b]">
+          Fill in the details below. We will generate a full itinerary you can explore on the map
+          and export as PDF.
+        </p>
+
+        <div className="space-y-6">
           <div>
-            <label htmlFor="destination" className="mb-2 block text-sm font-medium">
+            <label htmlFor="destination" className={labelClass}>
               Destination
             </label>
             <input
@@ -253,15 +273,15 @@ export default function TravelPlanningForm() {
               onChange={(event) =>
                 setFormData((prev) => ({ ...prev, destination: event.target.value }))
               }
-              placeholder="e.g. Bali"
-              className="w-full rounded-xl border border-zinc-300 px-4 py-3 text-sm outline-none transition focus:border-black"
+              placeholder="e.g. Kyoto, Lisbon, Bali"
+              className={inputClass}
               required
             />
           </div>
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
-              <label htmlFor="budget" className="mb-2 block text-sm font-medium">
+              <label htmlFor="budget" className={labelClass}>
                 Budget
               </label>
               <input
@@ -272,13 +292,13 @@ export default function TravelPlanningForm() {
                 onChange={(event) =>
                   setFormData((prev) => ({ ...prev, budget: Number(event.target.value) }))
                 }
-                className="w-full rounded-xl border border-zinc-300 px-4 py-3 text-sm outline-none transition focus:border-black"
+                className={inputClass}
                 required
               />
             </div>
 
             <div>
-              <label htmlFor="days" className="mb-2 block text-sm font-medium">
+              <label htmlFor="days" className={labelClass}>
                 Number of days
               </label>
               <input
@@ -289,14 +309,14 @@ export default function TravelPlanningForm() {
                 onChange={(event) =>
                   setFormData((prev) => ({ ...prev, days: Number(event.target.value) }))
                 }
-                className="w-full rounded-xl border border-zinc-300 px-4 py-3 text-sm outline-none transition focus:border-black"
+                className={inputClass}
                 required
               />
             </div>
           </div>
 
           <div>
-            <label htmlFor="travelStyle" className="mb-2 block text-sm font-medium">
+            <label htmlFor="travelStyle" className={labelClass}>
               Travel style
             </label>
             <select
@@ -308,7 +328,10 @@ export default function TravelPlanningForm() {
                   travelStyle: event.target.value as TravelStyle,
                 }))
               }
-              className="w-full rounded-xl border border-zinc-300 bg-white px-4 py-3 text-sm outline-none transition focus:border-black"
+              className={`${inputClass} cursor-pointer appearance-none bg-[length:1rem] bg-[right_0.75rem_center] bg-no-repeat pr-10`}
+              style={{
+                backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23475569'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E")`,
+              }}
             >
               {travelStyles.map((style) => (
                 <option key={style} value={style}>
@@ -319,20 +342,24 @@ export default function TravelPlanningForm() {
           </div>
 
           <fieldset>
-            <legend className="mb-2 block text-sm font-medium">Interests</legend>
+            <legend className={labelClass}>Interests</legend>
             <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
               {interestsList.map((interest) => {
                 const checked = formData.interests.includes(interest);
                 return (
                   <label
                     key={interest}
-                    className="flex cursor-pointer items-center gap-3 rounded-xl border border-zinc-300 px-3 py-2 text-sm transition hover:border-zinc-500"
+                    className={`group flex cursor-pointer items-center gap-3 rounded-xl border px-3.5 py-2.5 text-sm font-medium transition ${
+                      checked
+                        ? "border-[#c9a227]/50 bg-[#c9a227]/10 text-[#0c1829] shadow-sm"
+                        : "border-[#0c1829]/10 bg-white/60 text-[#475569] hover:border-[#c9a227]/35"
+                    }`}
                   >
                     <input
                       type="checkbox"
                       checked={checked}
                       onChange={() => toggleInterest(interest)}
-                      className="h-4 w-4 rounded border-zinc-400 accent-black"
+                      className="h-4 w-4 rounded border-[#cbd5e1] text-[#c9a227] focus:ring-[#c9a227]/40"
                     />
                     <span className="capitalize">{interest}</span>
                   </label>
@@ -343,7 +370,7 @@ export default function TravelPlanningForm() {
         </div>
 
         {error ? (
-          <p className="mt-4 rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+          <p className="mt-6 rounded-xl border border-red-200/80 bg-red-50/90 px-4 py-3 text-sm text-red-800">
             {error}
           </p>
         ) : null}
@@ -351,36 +378,63 @@ export default function TravelPlanningForm() {
         <button
           type="submit"
           disabled={isLoading}
-          className="mt-6 w-full rounded-xl bg-black px-4 py-3 text-base font-semibold text-white transition-colors hover:bg-zinc-800 disabled:cursor-not-allowed disabled:bg-zinc-500"
+          className="mt-8 w-full rounded-xl bg-gradient-to-r from-[#0c1829] via-[#1e3a5f] to-[#1e3a5f] px-4 py-3.5 text-base font-semibold text-white shadow-lg shadow-[#0c1829]/25 transition hover:brightness-110 hover:shadow-xl disabled:cursor-not-allowed disabled:opacity-60"
         >
-          {isLoading ? "Generating..." : "Generate Plan"}
+          {isLoading ? (
+            <span className="inline-flex items-center justify-center gap-2">
+              <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+              Crafting your itinerary…
+            </span>
+          ) : (
+            "Generate my plan"
+          )}
         </button>
       </form>
 
-      {generatedPlan ? <TravelResults result={generatedPlan} /> : null}
+      {generatedPlan ? (
+        <div className="animate-fade-in-up mx-auto max-w-3xl pt-2">
+          <TravelResults result={generatedPlan} />
+        </div>
+      ) : null}
 
       {showUpgradeModal ? (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
-          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
-            <h3 className="text-lg font-semibold">Daily Free Limit Reached</h3>
-            <p className="mt-2 text-sm text-zinc-700">Upgrade to generate more plans</p>
-            <p className="mt-1 text-sm text-zinc-500">₹99 per plan</p>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0c1829]/60 p-4 backdrop-blur-sm">
+          <div
+            className="relative w-full max-w-md overflow-hidden rounded-3xl border border-white/20 bg-white p-8 shadow-2xl"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="upgrade-title"
+          >
+            <div
+              className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-[#1e3a5f] via-[#c9a227] to-[#e8a87c]"
+              aria-hidden
+            />
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#c9a227]">
+              Premium
+            </p>
+            <h3 id="upgrade-title" className="font-[family-name:var(--font-playfair)] mt-2 text-2xl font-semibold text-[#0c1829]">
+              Daily free limit reached
+            </h3>
+            <p className="mt-3 text-sm leading-relaxed text-[#64748b]">
+              Upgrade to generate more plans whenever inspiration strikes.
+            </p>
+            <p className="mt-2 text-lg font-semibold text-[#0c1829]">₹99 per plan</p>
 
-            <div className="mt-5 flex gap-3">
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <button
                 type="button"
                 onClick={() => setShowUpgradeModal(false)}
-                className="w-full rounded-lg border border-zinc-300 px-4 py-2 text-sm font-medium text-zinc-700"
+                className="w-full rounded-xl border border-[#0c1829]/15 bg-white px-4 py-3 text-sm font-semibold text-[#475569] transition hover:bg-[#f8f6f3]"
               >
-                Maybe Later
+                Maybe later
               </button>
               <button
                 type="button"
                 onClick={handleUpgrade}
                 disabled={isPaying}
-                className="w-full rounded-lg bg-black px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-zinc-800 disabled:cursor-not-allowed disabled:bg-zinc-500"
+                className="w-full rounded-xl bg-gradient-to-r from-[#0c1829] to-[#1e3a5f] px-4 py-3 text-sm font-semibold text-white shadow-md transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60"
               >
-                {isPaying ? "Processing..." : "Pay with Razorpay"}
+                {isPaying ? "Opening…" : "Pay with Razorpay"}
               </button>
             </div>
           </div>

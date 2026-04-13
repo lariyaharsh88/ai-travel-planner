@@ -117,7 +117,7 @@ export default function ItineraryMap({ places }: ItineraryMapProps) {
     coordinates.length > 0 ? [coordinates[0].lat, coordinates[0].lon] : defaultCenter;
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-zinc-200">
+    <div className="overflow-hidden rounded-2xl border border-[#0c1829]/12 shadow-inner">
       <div className="h-64 w-full sm:h-80">
         <MapContainer center={center} zoom={coordinates.length > 0 ? 5 : 3} className="h-full w-full">
           <TileLayer
@@ -132,8 +132,8 @@ export default function ItineraryMap({ places }: ItineraryMapProps) {
         </MapContainer>
       </div>
 
-      {isLoadingMap ? <p className="px-3 py-2 text-sm text-zinc-600">Loading map...</p> : null}
-      {mapError ? <p className="px-3 py-2 text-sm text-red-600">{mapError}</p> : null}
+      {isLoadingMap ? <p className="px-3 py-2 text-sm text-[#64748b]">Loading map…</p> : null}
+      {mapError ? <p className="px-3 py-2 text-sm text-red-700">{mapError}</p> : null}
     </div>
   );
 }
