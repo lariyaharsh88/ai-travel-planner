@@ -1,31 +1,43 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f8f6f3;
-  --foreground: #1a1a1c;
-  --brand-deep: #0c1829;
-  --brand-accent: #c9a227;
-  --brand-warm: #e8a87c;
-  --brand-mist: rgba(255, 255, 255, 0.72);
+  --background: #faf8f4;
+  --foreground: #1c1917;
+  --brand-accent: #ff6b35;
+  --brand-mist: rgba(255, 255, 255, 0.78);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-  --font-serif: var(--font-playfair);
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .animate-fade-in-up,
+  .animate-shimmer-overlay {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
 }
 
 @layer utilities {
   .text-gradient-brand {
-    background: linear-gradient(135deg, #0c1829 0%, #1e3a5f 45%, #c9a227 100%);
+    background: linear-gradient(135deg, #1c1917 0%, #44403c 45%, #ff6b35 100%);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
@@ -33,14 +45,33 @@ body {
 
   .surface-hero {
     background:
-      radial-gradient(ellipse 120% 80% at 50% -20%, rgba(201, 162, 39, 0.18), transparent 50%),
-      radial-gradient(ellipse 80% 50% at 100% 50%, rgba(30, 58, 95, 0.12), transparent 45%),
-      radial-gradient(ellipse 60% 40% at 0% 80%, rgba(232, 168, 124, 0.15), transparent 40%),
-      linear-gradient(180deg, #f0ebe4 0%, #f8f6f3 40%, #eef2f6 100%);
+      radial-gradient(ellipse 120% 80% at 50% -20%, rgba(255, 107, 53, 0.12), transparent 50%),
+      radial-gradient(ellipse 80% 50% at 100% 50%, rgba(28, 25, 23, 0.06), transparent 45%),
+      linear-gradient(180deg, #f5f0e8 0%, #faf8f4 45%, #f0ebe4 100%);
   }
 
   .noise-overlay {
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+  }
+
+  .animate-shimmer-overlay {
+    background: linear-gradient(
+      110deg,
+      transparent 38%,
+      rgba(255, 255, 255, 0.65) 50%,
+      transparent 62%
+    );
+    background-size: 200% 100%;
+    animation: shimmer-slide 1.6s ease-in-out infinite;
+  }
+
+  @keyframes shimmer-slide {
+    0% {
+      background-position: 200% 0;
+    }
+    100% {
+      background-position: -200% 0;
+    }
   }
 
   .animate-fade-in-up {
@@ -75,7 +106,7 @@ body {
   }
 
   input[type="range"].range-slider:focus-visible {
-    outline: 2px solid rgba(30, 58, 95, 0.45);
+    outline: 2px solid rgba(255, 107, 53, 0.45);
     outline-offset: 2px;
     border-radius: 9999px;
   }

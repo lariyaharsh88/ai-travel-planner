@@ -1,28 +1,20 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Playfair_Display } from "next/font/google";
+import { Inter } from "next/font/google";
 import "./globals.css";
 import "leaflet/dist/leaflet.css";
+import Navbar from "@/components/Navbar";
+import Providers from "@/components/Providers";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
-const playfair = Playfair_Display({
-  variable: "--font-playfair",
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
   display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "AI Travel Planner — Your next adventure, planned",
+  title: "EpicIndiaTrips AI Planner — Plan India with AI",
   description:
-    "Generate day-by-day itineraries, budgets, reel ideas, and blog drafts tailored to your style.",
+    "Hidden gems, reels, and full itineraries in seconds. Day-wise plans, maps, budgets, and content ideas.",
 };
 
 export default function RootLayout({
@@ -31,11 +23,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} ${playfair.variable} h-full antialiased`}
-    >
-      <body className="min-h-full flex flex-col bg-[#f8f6f3] text-[#1a1a1c]">{children}</body>
+    <html lang="en" className={`${inter.variable} h-full scroll-smooth antialiased`}>
+      <body className="min-h-full flex flex-col bg-[#faf8f4] text-stone-900">
+        <Providers>
+          <Navbar />
+          {children}
+        </Providers>
+      </body>
     </html>
   );
 }

@@ -11,7 +11,7 @@ type DestinationComboboxProps = {
 };
 
 const shell =
-  "relative flex w-full items-center gap-2 rounded-xl border border-[#0c1829]/12 bg-white/95 px-3 py-2 shadow-inner transition focus-within:border-[#c9a227]/60 focus-within:ring-2 focus-within:ring-[#c9a227]/25";
+  "relative flex w-full items-center gap-2 rounded-2xl border border-stone-200/90 bg-white px-3 py-2.5 shadow-inner transition focus-within:border-[#FF6B35]/55 focus-within:ring-2 focus-within:ring-[#FF6B35]/20";
 
 export default function DestinationCombobox({
   id: idProp,
@@ -77,7 +77,7 @@ export default function DestinationCombobox({
   return (
     <div ref={containerRef} className="relative">
       <div className={shell}>
-        <span className="text-[#94a3b8]" aria-hidden>
+        <span className="text-stone-400" aria-hidden>
           <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.75}>
             <path
               strokeLinecap="round"
@@ -103,13 +103,13 @@ export default function DestinationCombobox({
           }}
           onFocus={() => setOpen(true)}
           placeholder="Search city or region…"
-          className="min-w-0 flex-1 bg-transparent py-1 text-sm text-[#0c1829] outline-none placeholder:text-[#94a3b8]"
+          className="min-w-0 flex-1 bg-transparent py-1 text-sm text-stone-900 outline-none placeholder:text-stone-400"
           onKeyDown={onKeyDown}
         />
         {value ? (
           <button
             type="button"
-            className="rounded-md p-1 text-[#94a3b8] transition hover:bg-[#f1f5f9] hover:text-[#64748b]"
+            className="rounded-md p-1 text-stone-400 transition hover:bg-stone-100 hover:text-stone-600"
             aria-label="Clear destination"
             onClick={() => {
               onChange("");
@@ -127,14 +127,16 @@ export default function DestinationCombobox({
         <ul
           id={listId}
           role="listbox"
-          className="absolute z-20 mt-1 max-h-52 w-full overflow-auto rounded-xl border border-[#0c1829]/10 bg-white py-1 shadow-xl ring-1 ring-black/5"
+          className="absolute z-20 mt-1 max-h-52 w-full overflow-auto rounded-2xl border border-stone-200/90 bg-white py-1 shadow-xl ring-1 ring-black/5"
         >
           {filtered.map((item, index) => (
             <li key={item} role="option" aria-selected={value === item}>
               <button
                 type="button"
                 className={`flex w-full items-start px-3 py-2 text-left text-sm transition ${
-                  index === highlighted ? "bg-[#c9a227]/12 text-[#0c1829]" : "text-[#334155] hover:bg-[#f8f6f3]"
+                  index === highlighted
+                    ? "bg-[#FF6B35]/10 text-stone-900"
+                    : "text-stone-700 hover:bg-stone-50"
                 }`}
                 onMouseEnter={() => setHighlighted(index)}
                 onMouseDown={(e) => e.preventDefault()}

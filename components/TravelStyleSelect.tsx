@@ -1,16 +1,9 @@
 "use client";
 
 import { useEffect, useId, useRef, useState } from "react";
+import { TRAVEL_STYLES, type TravelStyleValue } from "@/lib/travel-styles";
 
-const STYLES = [
-  { value: "budget", label: "Budget", hint: "Smart spends" },
-  { value: "luxury", label: "Luxury", hint: "Premium stays" },
-  { value: "solo", label: "Solo", hint: "Your pace" },
-  { value: "couple", label: "Couple", hint: "Romantic" },
-  { value: "adventure", label: "Adventure", hint: "Active & bold" },
-] as const;
-
-export type TravelStyleValue = (typeof STYLES)[number]["value"];
+export type { TravelStyleValue } from "@/lib/travel-styles";
 
 type TravelStyleSelectProps = {
   value: TravelStyleValue;
@@ -24,7 +17,7 @@ export default function TravelStyleSelect({ value, onChange }: TravelStyleSelect
   const [open, setOpen] = useState(false);
   const wrapRef = useRef<HTMLDivElement>(null);
 
-  const current = STYLES.find((s) => s.value === value) ?? STYLES[0];
+  const current = TRAVEL_STYLES.find((s) => s.value === value) ?? TRAVEL_STYLES[0];
 
   useEffect(() => {
     const h = (e: MouseEvent) => {
@@ -63,7 +56,7 @@ export default function TravelStyleSelect({ value, onChange }: TravelStyleSelect
           aria-labelledby={btnId}
           className="absolute z-20 mt-1 w-full overflow-hidden rounded-xl border border-[#0c1829]/10 bg-white py-1 shadow-xl ring-1 ring-black/5"
         >
-          {STYLES.map((s) => (
+          {TRAVEL_STYLES.map((s) => (
             <li key={s.value} role="option" aria-selected={value === s.value}>
               <button
                 type="button"

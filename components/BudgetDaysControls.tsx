@@ -35,12 +35,12 @@ export default function BudgetDaysControls({
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
       <div>
         <div className="mb-2 flex items-center justify-between">
-          <span className="text-xs font-semibold uppercase tracking-wider text-[#475569]">Budget</span>
-          <span className="rounded-md bg-[#0c1829]/5 px-2 py-0.5 text-xs font-semibold tabular-nums text-[#0c1829]">
+          <span className="text-xs font-semibold uppercase tracking-wider text-stone-500">Budget</span>
+          <span className="rounded-md bg-stone-900/5 px-2 py-0.5 text-xs font-semibold tabular-nums text-stone-900">
             {formatInr(budget)}
           </span>
         </div>
-        <div className="rounded-xl border border-[#0c1829]/12 bg-white/95 p-3 shadow-inner">
+        <div className="rounded-2xl border border-stone-200/90 bg-white p-3 shadow-inner">
           <input
             type="range"
             min={BUDGET_MIN}
@@ -52,8 +52,8 @@ export default function BudgetDaysControls({
             style={
               {
                 "--range-pct": budgetPct,
-                "--fill-color": "#c9a227",
-                "--thumb-color": "#b8941f",
+                "--fill-color": "#FF6B35",
+                "--thumb-color": "#e85a2a",
               } as CSSProperties
             }
           />
@@ -65,8 +65,8 @@ export default function BudgetDaysControls({
                 onClick={() => onBudgetChange(p)}
                 className={`rounded-lg border px-2 py-1 text-[10px] font-semibold transition sm:text-xs ${
                   budget === p
-                    ? "border-[#c9a227] bg-[#c9a227]/15 text-[#0c1829]"
-                    : "border-[#0c1829]/10 bg-white text-[#64748b] hover:border-[#c9a227]/40"
+                    ? "border-[#FF6B35]/60 bg-[#FF6B35]/10 text-stone-900"
+                    : "border-stone-200 bg-white text-stone-500 hover:border-[#FF6B35]/35"
                 }`}
               >
                 {formatInr(p)}
@@ -74,7 +74,7 @@ export default function BudgetDaysControls({
             ))}
           </div>
           <label className="mt-2 flex items-center gap-2">
-            <span className="text-[10px] text-[#94a3b8] sm:text-xs">Exact</span>
+            <span className="text-[10px] text-stone-400 sm:text-xs">Exact</span>
             <input
               type="number"
               min={BUDGET_MIN}
@@ -86,7 +86,7 @@ export default function BudgetDaysControls({
                 if (Number.isNaN(n)) return;
                 onBudgetChange(Math.min(BUDGET_MAX, Math.max(BUDGET_MIN, n)));
               }}
-              className="w-full min-w-0 rounded-lg border border-[#0c1829]/10 bg-white px-2 py-1.5 text-sm tabular-nums outline-none focus:border-[#c9a227]/60 focus:ring-2 focus:ring-[#c9a227]/20"
+              className="w-full min-w-0 rounded-lg border border-stone-200 bg-white px-2 py-1.5 text-sm tabular-nums outline-none focus:border-[#FF6B35]/60 focus:ring-2 focus:ring-[#FF6B35]/20"
             />
           </label>
         </div>
@@ -94,29 +94,29 @@ export default function BudgetDaysControls({
 
       <div>
         <div className="mb-2 flex items-center justify-between">
-          <span className="text-xs font-semibold uppercase tracking-wider text-[#475569]">Trip length</span>
-          <span className="text-xs font-medium text-[#64748b]">days</span>
+          <span className="text-xs font-semibold uppercase tracking-wider text-stone-500">Trip length</span>
+          <span className="text-xs font-medium text-stone-500">days</span>
         </div>
-        <div className="flex items-center justify-between gap-3 rounded-xl border border-[#0c1829]/12 bg-white/95 px-2 py-2 shadow-inner">
+        <div className="flex items-center justify-between gap-3 rounded-2xl border border-stone-200/90 bg-white px-2 py-2 shadow-inner">
           <button
             type="button"
             aria-label="Decrease days"
             disabled={days <= DAYS_MIN}
             onClick={() => onDaysChange(Math.max(DAYS_MIN, days - 1))}
-            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-[#0c1829]/10 bg-[#f8f6f3] text-lg font-semibold text-[#0c1829] transition hover:bg-[#c9a227]/15 disabled:cursor-not-allowed disabled:opacity-40"
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-stone-200 bg-[#faf8f4] text-lg font-semibold text-stone-900 transition hover:bg-[#FF6B35]/10 disabled:cursor-not-allowed disabled:opacity-40"
           >
             −
           </button>
           <div className="flex min-w-0 flex-1 flex-col items-center">
-            <span className="text-3xl font-semibold tabular-nums leading-none text-[#0c1829]">{days}</span>
-            <span className="mt-0.5 text-[10px] uppercase tracking-wider text-[#94a3b8]">days</span>
+            <span className="text-3xl font-semibold tabular-nums leading-none text-stone-900">{days}</span>
+            <span className="mt-0.5 text-[10px] uppercase tracking-wider text-stone-400">days</span>
           </div>
           <button
             type="button"
             aria-label="Increase days"
             disabled={days >= DAYS_MAX}
             onClick={() => onDaysChange(Math.min(DAYS_MAX, days + 1))}
-            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-[#0c1829]/10 bg-[#f8f6f3] text-lg font-semibold text-[#0c1829] transition hover:bg-[#c9a227]/15 disabled:cursor-not-allowed disabled:opacity-40"
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-stone-200 bg-[#faf8f4] text-lg font-semibold text-stone-900 transition hover:bg-[#FF6B35]/10 disabled:cursor-not-allowed disabled:opacity-40"
           >
             +
           </button>
@@ -135,8 +135,8 @@ export default function BudgetDaysControls({
           style={
             {
               "--range-pct": daysPct,
-              "--fill-color": "#1e3a5f",
-              "--thumb-color": "#152a45",
+              "--fill-color": "#1c1917",
+              "--thumb-color": "#292524",
             } as CSSProperties
           }
         />
