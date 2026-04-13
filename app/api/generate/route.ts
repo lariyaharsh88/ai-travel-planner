@@ -72,10 +72,10 @@ function normalizeResponse(data: unknown): TravelPlanResponse {
 
 export async function POST(request: Request) {
   try {
-    const apiKey = process.env.GEMINI_API_KEY;
+    const apiKey = process.env.GROQ_API_KEY;
     if (!apiKey) {
       return NextResponse.json(
-        { error: "Missing GEMINI_API_KEY in environment variables." },
+        { error: "Missing GROQ_API_KEY in environment variables." },
         { status: 500 },
       );
     }
@@ -129,69 +129,57 @@ Return ONLY valid JSON with this exact shape:
 }
 `.trim();
 
-    const preferredModel = process.env.GEMINI_MODEL ?? "gemini-2.0-flash";
-    const fallbackModels = ["gemini-2.0-flash", "gemini-1.5-flash-latest"];
-    const modelsToTry = Array.from(new Set([preferredModel, ...fallbackModels]));
-
-    let geminiResponse: Response | null = null;
-    let lastErrorText = "";
-
-    for (const model of modelsToTry) {
-      const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
+    const model = process.env.GROQ_MODEL ?? "llama-3.1-8b-instant";
+    const groqResponse = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        model,
+        response_format: { type: "json_object" },
+        messages: [
+          {
+            role: "system",
+            content: "You are an expert travel planner. Return only valid JSON.",
           },
-          body: JSON.stringify({
-            contents: [
-              {
-                role: "user",
-                parts: [{ text: prompt }],
-              },
-            ],
-            generationConfig: {
-              responseMimeType: "application/json",
-            },
-          }),
-        },
-      );
+          {
+            role: "user",
+            content: prompt,
+          },
+        ],
+        temperature: 0.6,
+      }),
+    });
 
-      if (response.ok) {
-        geminiResponse = response;
-        break;
-      }
-
-      const errorText = await response.text();
-      lastErrorText = errorText;
-      if (response.status !== 404) {
+    if (!groqResponse.ok) {
+      const errorText = await groqResponse.text();
+      if (groqResponse.status === 429) {
         return NextResponse.json(
-          { error: "Gemini request failed.", details: errorText },
-          { status: 502 },
+          { error: "Groq quota exceeded. Please try again later.", details: errorText },
+          { status: 429 },
         );
       }
-    }
 
-    if (!geminiResponse) {
       return NextResponse.json(
-        { error: "Gemini request failed.", details: lastErrorText },
+        { error: "Groq request failed.", details: errorText },
         { status: 502 },
       );
     }
 
-    const result = (await geminiResponse.json()) as {
-      candidates?: Array<{
-        content?: {
-          parts?: Array<{ text?: string }>;
+    const result = (await groqResponse.json()) as {
+      choices?: Array<{
+        message?: {
+          content?: string;
         };
       }>;
     };
 
-    const rawText = result.candidates?.[0]?.content?.parts?.[0]?.text;
+    const rawText = result.choices?.[0]?.message?.content;
     if (!rawText) {
       return NextResponse.json(
-        { error: "Gemini returned an empty response." },
+        { error: "Groq returned an empty response." },
         { status: 502 },
       );
     }
