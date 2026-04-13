@@ -64,9 +64,6 @@ export default function TravelResults({ result }: TravelResultsProps) {
         {sectionAccent}
         <div className="relative">
           <div className="mb-3 flex items-center gap-2">
-            <span className="text-lg" aria-hidden>
-              🗺️
-            </span>
             <h3 className="font-[family-name:var(--font-playfair)] text-lg font-semibold text-[#0c1829]">
               Itinerary map
             </h3>
@@ -79,9 +76,6 @@ export default function TravelResults({ result }: TravelResultsProps) {
         {sectionAccent}
         <div className="relative">
           <div className="mb-3 flex items-center gap-2">
-            <span className="text-lg" aria-hidden>
-              ✈️
-            </span>
             <h3 className="font-[family-name:var(--font-playfair)] text-lg font-semibold text-[#0c1829]">
               Day-by-day itinerary
             </h3>
@@ -136,9 +130,6 @@ export default function TravelResults({ result }: TravelResultsProps) {
         {sectionAccent}
         <div className="relative">
           <div className="mb-3 flex items-center gap-2">
-            <span className="text-lg" aria-hidden>
-              💰
-            </span>
             <h3 className="font-[family-name:var(--font-playfair)] text-lg font-semibold text-[#0c1829]">
               Budget breakdown
             </h3>
@@ -169,9 +160,6 @@ export default function TravelResults({ result }: TravelResultsProps) {
         {sectionAccent}
         <div className="relative">
           <div className="mb-3 flex items-center gap-2">
-            <span className="text-lg" aria-hidden>
-              🎬
-            </span>
             <h3 className="font-[family-name:var(--font-playfair)] text-lg font-semibold text-[#0c1829]">
               Reel ideas
             </h3>
@@ -202,9 +190,6 @@ export default function TravelResults({ result }: TravelResultsProps) {
         {sectionAccent}
         <div className="relative">
           <div className="mb-3 flex items-center gap-2">
-            <span className="text-lg" aria-hidden>
-              ✍️
-            </span>
             <h3 className="font-[family-name:var(--font-playfair)] text-lg font-semibold text-[#0c1829]">
               Blog preview
             </h3>

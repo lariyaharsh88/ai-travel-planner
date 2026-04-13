@@ -48,27 +48,27 @@ export default function IndiaExploreSection() {
 
   return (
     <section
-      className="relative overflow-hidden rounded-2xl border border-[#0c1829]/10 bg-white/80 p-4 shadow-md backdrop-blur-sm sm:p-5"
+      className="relative overflow-hidden rounded-2xl border border-[#0c1829]/10 bg-white/90 p-3 shadow-sm backdrop-blur-sm sm:p-4"
       aria-labelledby="india-explore-heading"
     >
       <div
         className="pointer-events-none absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-[#1e3a5f] via-[#c9a227] to-[#138808]/60"
         aria-hidden
       />
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
         <div className="min-w-0">
           <h2
             id="india-explore-heading"
-            className="font-[family-name:var(--font-playfair)] text-lg font-semibold text-[#0c1829] sm:text-xl"
+            className="font-[family-name:var(--font-playfair)] text-base font-semibold text-[#0c1829] sm:text-lg"
           >
-            India at a glance
+            Top India picks
           </h2>
-          <p className="mt-0.5 text-xs leading-snug text-[#64748b] sm:text-sm">
-            Tap markers for ideas—then plan your own route below.
+          <p className="mt-0.5 text-xs leading-snug text-[#64748b]">
+            Quick inspiration map.
           </p>
         </div>
-        <div className="flex shrink-0 flex-wrap gap-1.5 sm:max-w-[min(100%,22rem)] sm:justify-end">
-          {INDIA_TOP_DESTINATIONS.map((d) => (
+        <div className="flex shrink-0 flex-wrap gap-1.5 sm:justify-end">
+          {INDIA_TOP_DESTINATIONS.slice(0, 5).map((d) => (
             <span
               key={d.name}
               className="inline-flex items-center rounded-full border border-[#0c1829]/10 bg-[#f8f6f3] px-2 py-0.5 text-[10px] font-medium text-[#334155] sm:text-xs"
@@ -79,8 +79,8 @@ export default function IndiaExploreSection() {
         </div>
       </div>
 
-      <div className="mt-3 overflow-hidden rounded-xl border border-[#0c1829]/10 shadow-inner">
-        <div className="h-40 w-full sm:h-44">
+      <div className="mt-2 overflow-hidden rounded-xl border border-[#0c1829]/10 shadow-inner">
+        <div className="h-36 w-full sm:h-40">
           <MapContainer
             center={indiaCenter}
             zoom={indiaZoom}
