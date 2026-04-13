@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
-import L from "leaflet";
 
 const MapContainer = dynamic(
   () => import("react-leaflet").then((mod) => mod.MapContainer),
@@ -39,12 +38,21 @@ export default function ItineraryMap({ places }: ItineraryMapProps) {
   );
 
   useEffect(() => {
-    delete (L.Icon.Default.prototype as { _getIconUrl?: unknown })._getIconUrl;
-    L.Icon.Default.mergeOptions({
-      iconRetinaUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
-      iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
-      shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
-    });
+    const configureLeafletIcons = async () => {
+      const leaflet = await import("leaflet");
+      const iconDefault = leaflet.Icon.Default as typeof leaflet.Icon.Default & {
+        prototype: { _getIconUrl?: unknown };
+      };
+
+      delete iconDefault.prototype._getIconUrl;
+      iconDefault.mergeOptions({
+        iconRetinaUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
+        iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
+        shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+      });
+    };
+
+    void configureLeafletIcons();
   }, []);
 
   useEffect(() => {
@@ -82,7 +90,7 @@ export default function ItineraryMap({ places }: ItineraryMapProps) {
 
         const validCoordinates = results.filter(
           (item): item is Coordinate =>
-            Boolean(item) && Number.isFinite(item.lat) && Number.isFinite(item.lon),
+            item !== null && Number.isFinite(item.lat) && Number.isFinite(item.lon),
         );
 
         if (!active) return;
