@@ -36,6 +36,40 @@ body {
 }
 
 @layer utilities {
+  /* Keyboard: skip to main form */
+  .skip-link {
+    position: absolute;
+    left: -9999px;
+    top: 0.75rem;
+    z-index: 100;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  .skip-link:focus,
+  .skip-link:focus-visible {
+    left: 1rem;
+    position: fixed;
+    width: auto;
+    height: auto;
+    min-height: 44px;
+    min-width: 44px;
+    overflow: visible;
+    clip-path: none;
+    white-space: normal;
+    padding: 0.625rem 1rem;
+    border-radius: 0.5rem;
+    background-color: #1c1917;
+    color: #fff;
+    font-size: 0.875rem;
+    font-weight: 600;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2);
+    outline: 2px solid #ff6b35;
+    outline-offset: 2px;
+  }
+
   .text-gradient-brand {
     background: linear-gradient(135deg, #1c1917 0%, #44403c 45%, #ff6b35 100%);
     -webkit-background-clip: text;

@@ -8,6 +8,8 @@ type DestinationComboboxProps = {
   value: string;
   onChange: (value: string) => void;
   required?: boolean;
+  /** Optional id of helper text for `aria-describedby` */
+  describedBy?: string;
 };
 
 const shell =
@@ -18,6 +20,7 @@ export default function DestinationCombobox({
   value,
   onChange,
   required,
+  describedBy,
 }: DestinationComboboxProps) {
   const autoId = useId();
   const id = idProp ?? autoId;
@@ -103,7 +106,8 @@ export default function DestinationCombobox({
           }}
           onFocus={() => setOpen(true)}
           placeholder="Search city or region…"
-          className="min-w-0 flex-1 bg-transparent py-1 text-sm text-stone-900 outline-none placeholder:text-stone-400"
+          aria-describedby={describedBy}
+          className="min-w-0 flex-1 bg-transparent py-1 text-sm text-stone-900 outline-none placeholder:text-stone-500"
           onKeyDown={onKeyDown}
         />
         {value ? (

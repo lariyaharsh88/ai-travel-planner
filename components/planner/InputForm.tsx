@@ -72,10 +72,10 @@ export default function InputForm({
 
       <div className="mb-4 flex flex-wrap items-end justify-between gap-3 sm:mb-5">
         <div>
-          <h2 className="text-xl font-semibold tracking-tight text-stone-900 sm:text-2xl">
+          <h3 className="text-xl font-semibold tracking-tight text-stone-900 sm:text-2xl">
             Your trip details
-          </h2>
-          <p className="mt-1 text-sm text-stone-500">
+          </h3>
+          <p className="mt-1 text-sm text-stone-700">
             We’ll build a day-wise plan, map pins, budget, and content ideas.
           </p>
         </div>
@@ -84,7 +84,7 @@ export default function InputForm({
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true }}
           transition={springGentle}
-          className="rounded-full bg-stone-100 px-3 py-1 text-[11px] font-medium uppercase tracking-wider text-stone-500"
+          className="rounded-full bg-stone-100 px-3 py-1 text-[11px] font-medium uppercase tracking-wider text-stone-700"
         >
           1 free / day
         </motion.span>
@@ -94,9 +94,9 @@ export default function InputForm({
         <div className="relative">
           <label
             htmlFor="destination"
-            className="mb-2 flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-stone-500"
+            className="mb-2 flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-stone-700"
           >
-            <MapPin className="h-3.5 w-3.5 text-[#FF6B35]" aria-hidden />
+            <MapPin className="h-3.5 w-3.5 shrink-0 text-[#FF6B35]" aria-hidden />
             Destination
           </label>
           <DestinationCombobox
@@ -104,8 +104,11 @@ export default function InputForm({
             value={formData.destination}
             onChange={(destination) => setFormData((prev) => ({ ...prev, destination }))}
             required
+            describedBy="destination-hint"
           />
-          <p className="mt-2 text-xs text-stone-400">Search popular places or type your own.</p>
+          <p id="destination-hint" className="mt-2 text-xs text-stone-600">
+            Search popular places or type your own.
+          </p>
         </div>
 
         <BudgetDaysControls
@@ -116,28 +119,34 @@ export default function InputForm({
         />
 
         <div>
-          <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-stone-500">
+          <p id="travel-style-label" className="mb-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-stone-700">
             Travel style
           </p>
-          <div className="flex flex-wrap gap-2">
+          <div
+            className="flex flex-wrap gap-2"
+            role="radiogroup"
+            aria-labelledby="travel-style-label"
+          >
             {TRAVEL_STYLES.map((s) => {
               const active = formData.travelStyle === s.value;
               return (
                 <motion.button
                   key={s.value}
                   type="button"
+                  role="radio"
+                  aria-checked={active}
                   onClick={() => setFormData((prev) => ({ ...prev, travelStyle: s.value }))}
                   whileHover={{ y: -2, transition: { duration: 0.35, ease: EASE_APPLE } }}
                   whileTap={{ scale: 0.97 }}
                   transition={springGentle}
-                  className={`rounded-full border px-4 py-2 text-left text-sm font-medium transition-shadow duration-300 ${
+                  className={`rounded-full border px-4 py-2 text-left text-sm font-medium transition-shadow duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FF6B35] ${
                     active
                       ? "border-[#FF6B35]/50 bg-gradient-to-br from-[#FF6B35]/12 to-amber-50/80 text-stone-900 shadow-[0_8px_24px_-12px_rgba(255,107,53,0.45)]"
-                      : "border-stone-200/90 bg-white text-stone-600 shadow-sm hover:border-stone-300/90 hover:shadow-md"
+                      : "border-stone-200/90 bg-white text-stone-700 shadow-sm hover:border-stone-300/90 hover:shadow-md"
                   }`}
                 >
                   <span className="block capitalize">{s.label}</span>
-                  <span className="mt-0.5 block text-[11px] font-normal text-stone-500">{s.hint}</span>
+                  <span className="mt-0.5 block text-[11px] font-normal text-stone-600">{s.hint}</span>
                 </motion.button>
               );
             })}
@@ -145,24 +154,25 @@ export default function InputForm({
         </div>
 
         <div>
-          <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-stone-500">
+          <p id="interests-label" className="mb-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-stone-700">
             Interests
           </p>
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-2" role="group" aria-labelledby="interests-label">
             {interestsList.map((interest) => {
               const checked = formData.interests.includes(interest);
               return (
                 <motion.button
                   key={interest}
                   type="button"
+                  aria-pressed={checked}
                   onClick={() => toggleInterest(interest)}
                   whileHover={{ y: -2, scale: 1.02 }}
                   whileTap={{ scale: 0.96 }}
                   transition={springGentle}
-                  className={`rounded-full border px-3.5 py-2 text-xs font-medium capitalize transition-colors duration-300 ${
+                  className={`rounded-full border px-3.5 py-2 text-xs font-medium capitalize transition-colors duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FF6B35] ${
                     checked
                       ? "border-[#FF6B35]/45 bg-stone-900 text-white shadow-md shadow-stone-900/20"
-                      : "border-stone-200 bg-white text-stone-600 hover:border-stone-300 hover:shadow-sm"
+                      : "border-stone-200 bg-white text-stone-700 hover:border-stone-300 hover:shadow-sm"
                   }`}
                 >
                   {interest}
@@ -188,10 +198,11 @@ export default function InputForm({
       <motion.button
         type="submit"
         disabled={isLoading}
+        aria-busy={isLoading}
         whileHover={isLoading ? undefined : { scale: 1.015, transition: { duration: 0.4, ease: EASE_APPLE } }}
         whileTap={isLoading ? undefined : { scale: 0.992 }}
         transition={springGentle}
-        className="mt-6 flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-stone-900 via-stone-900 to-stone-800 px-5 py-3.5 text-sm font-semibold text-white shadow-[0_12px_40px_-12px_rgba(28,25,23,0.55)] ring-1 ring-white/10 transition-[box-shadow] duration-500 hover:shadow-[0_20px_50px_-8px_rgba(255,107,53,0.32)] disabled:cursor-not-allowed disabled:opacity-55 sm:text-base"
+        className="mt-6 flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-stone-900 via-stone-900 to-stone-800 px-5 py-3.5 text-sm font-semibold text-white shadow-[0_12px_40px_-12px_rgba(28,25,23,0.55)] ring-1 ring-white/10 transition-[box-shadow] duration-500 hover:shadow-[0_20px_50px_-8px_rgba(255,107,53,0.32)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FF6B35] disabled:cursor-not-allowed disabled:opacity-55 sm:text-base"
       >
         {isLoading ? (
           <>

@@ -26,6 +26,9 @@ export default function RootLayout({
     <html lang="en" className={`${inter.variable} h-full scroll-smooth antialiased`}>
       <body className="min-h-full flex flex-col bg-[#faf8f4] text-stone-900">
         <Providers>
+          <a href="#planner-form" className="skip-link">
+            Skip to trip form
+          </a>
           <Navbar />
           {children}
         </Providers>
