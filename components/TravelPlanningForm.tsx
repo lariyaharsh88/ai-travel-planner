@@ -240,10 +240,10 @@ export default function TravelPlanningForm() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <form
         onSubmit={handleSubmit}
-        className="relative mx-auto w-full max-w-xl overflow-hidden rounded-2xl border border-[#0c1829]/10 bg-white/85 p-5 shadow-[0_18px_40px_-12px_rgba(12,24,41,0.14)] backdrop-blur-md sm:p-6 lg:mx-0 lg:max-w-none"
+        className="relative w-full overflow-hidden rounded-2xl border border-[#0c1829]/10 bg-white/90 p-4 shadow-[0_16px_36px_-16px_rgba(12,24,41,0.14)] backdrop-blur-md sm:p-5"
       >
         <div
           className="pointer-events-none absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-[#1e3a5f] via-[#c9a227] to-[#e8a87c]"
@@ -255,11 +255,11 @@ export default function TravelPlanningForm() {
           </h2>
           <span className="text-[10px] font-medium text-[#64748b] sm:text-xs">1 free / day</span>
         </div>
-        <p className="mb-5 text-xs leading-relaxed text-[#64748b] sm:text-sm">
+        <p className="mb-4 text-xs leading-relaxed text-[#64748b] sm:text-sm">
           Details below → full itinerary, map, and PDF export.
         </p>
 
-        <div className="space-y-4 lg:grid lg:grid-cols-2 lg:gap-x-6 lg:gap-y-4 lg:space-y-0">
+        <div className="space-y-3 lg:grid lg:grid-cols-2 lg:gap-x-5 lg:gap-y-3 lg:space-y-0">
           <div className="lg:col-span-2">
             <label htmlFor="destination" className={labelClass}>
               Where to?
@@ -321,7 +321,7 @@ export default function TravelPlanningForm() {
         </div>
 
         {error ? (
-          <p className="mt-6 rounded-xl border border-red-200/80 bg-red-50/90 px-4 py-3 text-sm text-red-800">
+          <p className="mt-4 rounded-xl border border-red-200/80 bg-red-50/90 px-4 py-2.5 text-sm text-red-800">
             {error}
           </p>
         ) : null}
@@ -329,7 +329,7 @@ export default function TravelPlanningForm() {
         <button
           type="submit"
           disabled={isLoading}
-          className="mt-6 w-full rounded-xl bg-gradient-to-r from-[#0c1829] via-[#1e3a5f] to-[#1e3a5f] px-4 py-3 text-sm font-semibold text-white shadow-md shadow-[#0c1829]/20 transition hover:brightness-110 hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-60 sm:text-base"
+          className="mt-4 w-full rounded-xl bg-gradient-to-r from-[#0c1829] via-[#1e3a5f] to-[#1e3a5f] px-4 py-3 text-sm font-semibold text-white shadow-md shadow-[#0c1829]/20 transition hover:brightness-110 hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-60 sm:text-base"
         >
           {isLoading ? (
             <span className="inline-flex items-center justify-center gap-2">
@@ -343,7 +343,7 @@ export default function TravelPlanningForm() {
       </form>
 
       {generatedPlan ? (
-        <div className="animate-fade-in-up mx-auto max-w-3xl pt-1 lg:mx-0 lg:max-w-none">
+        <div className="animate-fade-in-up pt-1">
           <TravelResults result={generatedPlan} />
         </div>
       ) : null}
