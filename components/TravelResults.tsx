@@ -43,7 +43,7 @@ export default function TravelResults({ result }: TravelResultsProps) {
   };
 
   return (
-    <section className="w-full max-w-3xl space-y-5 text-left">
+    <section className="w-full max-w-3xl space-y-5 text-left lg:max-w-none">
       <div className="flex flex-col items-stretch justify-between gap-3 sm:flex-row sm:items-center">
         <div>
           <h2 className="font-[family-name:var(--font-playfair)] text-xl font-semibold text-[#0c1829] sm:text-2xl">

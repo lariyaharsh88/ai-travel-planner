@@ -1,5 +1,7 @@
 "use client";
 
+import type { CSSProperties } from "react";
+
 const BUDGET_MIN = 0;
 const BUDGET_MAX = 500_000;
 const BUDGET_STEP = 500;
@@ -26,6 +28,8 @@ export default function BudgetDaysControls({
   onDaysChange,
 }: BudgetDaysControlsProps) {
   const presets = [5000, 25_000, 75_000, 200_000];
+  const budgetPct = `${(Math.min(Math.max(budget, BUDGET_MIN), BUDGET_MAX) / BUDGET_MAX) * 100}%`;
+  const daysPct = `${((Math.min(Math.max(days, DAYS_MIN), DAYS_MAX) - DAYS_MIN) / (DAYS_MAX - DAYS_MIN)) * 100}%`;
 
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -44,7 +48,14 @@ export default function BudgetDaysControls({
             step={BUDGET_STEP}
             value={Math.min(Math.max(budget, BUDGET_MIN), BUDGET_MAX)}
             onChange={(e) => onBudgetChange(Number(e.target.value))}
-            className="h-2 w-full cursor-pointer accent-[#c9a227]"
+            className="range-slider w-full"
+            style={
+              {
+                "--range-pct": budgetPct,
+                "--fill-color": "#c9a227",
+                "--thumb-color": "#b8941f",
+              } as CSSProperties
+            }
           />
           <div className="mt-2 flex flex-wrap gap-1.5">
             {presets.map((p) => (
@@ -116,7 +127,18 @@ export default function BudgetDaysControls({
           max={DAYS_MAX}
           value={days}
           onChange={(e) => onDaysChange(Number(e.target.value))}
-          className="mt-2 h-1.5 w-full cursor-pointer appearance-none rounded-full accent-[#1e3a5f]"
+          className="range-slider mt-3 w-full"
+          aria-valuemin={DAYS_MIN}
+          aria-valuemax={DAYS_MAX}
+          aria-valuenow={days}
+          aria-label="Trip length in days"
+          style={
+            {
+              "--range-pct": daysPct,
+              "--fill-color": "#1e3a5f",
+              "--thumb-color": "#152a45",
+            } as CSSProperties
+          }
         />
       </div>
     </div>

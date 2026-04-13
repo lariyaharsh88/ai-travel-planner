@@ -1,8 +1,8 @@
 /** Decorative SVGs — no external assets */
-export default function TravelHeroArt() {
+export default function TravelHeroArt({ className = "" }: { className?: string }) {
   return (
     <div
-      className="pointer-events-none mx-auto mb-6 flex max-w-md justify-center gap-6 opacity-90 sm:mb-5"
+      className={`pointer-events-none mx-auto flex max-w-md justify-center gap-4 opacity-90 sm:gap-6 ${className}`}
       aria-hidden
     >
       <svg width="72" height="56" viewBox="0 0 72 56" fill="none" className="text-[#1e3a5f]">

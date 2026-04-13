@@ -243,7 +243,7 @@ export default function TravelPlanningForm() {
     <div className="space-y-6">
       <form
         onSubmit={handleSubmit}
-        className="relative mx-auto w-full max-w-xl overflow-hidden rounded-2xl border border-[#0c1829]/10 bg-white/85 p-5 shadow-[0_18px_40px_-12px_rgba(12,24,41,0.14)] backdrop-blur-md sm:p-6"
+        className="relative mx-auto w-full max-w-xl overflow-hidden rounded-2xl border border-[#0c1829]/10 bg-white/85 p-5 shadow-[0_18px_40px_-12px_rgba(12,24,41,0.14)] backdrop-blur-md sm:p-6 lg:mx-0 lg:max-w-none"
       >
         <div
           className="pointer-events-none absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-[#1e3a5f] via-[#c9a227] to-[#e8a87c]"
@@ -259,8 +259,8 @@ export default function TravelPlanningForm() {
           Details below → full itinerary, map, and PDF export.
         </p>
 
-        <div className="space-y-4">
-          <div>
+        <div className="space-y-4 lg:grid lg:grid-cols-2 lg:gap-x-6 lg:gap-y-4 lg:space-y-0">
+          <div className="lg:col-span-2">
             <label htmlFor="destination" className={labelClass}>
               Where to?
             </label>
@@ -275,14 +275,16 @@ export default function TravelPlanningForm() {
             </p>
           </div>
 
-          <BudgetDaysControls
-            budget={formData.budget}
-            days={formData.days}
-            onBudgetChange={(budget) => setFormData((prev) => ({ ...prev, budget }))}
-            onDaysChange={(days) => setFormData((prev) => ({ ...prev, days }))}
-          />
+          <div className="lg:col-span-2">
+            <BudgetDaysControls
+              budget={formData.budget}
+              days={formData.days}
+              onBudgetChange={(budget) => setFormData((prev) => ({ ...prev, budget }))}
+              onDaysChange={(days) => setFormData((prev) => ({ ...prev, days }))}
+            />
+          </div>
 
-          <fieldset>
+          <fieldset className="min-w-0">
             <legend className={labelClass}>Travel style</legend>
             <TravelStyleSelect
               value={formData.travelStyle}
@@ -290,9 +292,9 @@ export default function TravelPlanningForm() {
             />
           </fieldset>
 
-          <fieldset>
+          <fieldset className="min-w-0">
             <legend className={labelClass}>Interests</legend>
-            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
               {interestsList.map((interest) => {
                 const checked = formData.interests.includes(interest);
                 return (
@@ -341,7 +343,7 @@ export default function TravelPlanningForm() {
       </form>
 
       {generatedPlan ? (
-        <div className="animate-fade-in-up mx-auto max-w-3xl pt-1">
+        <div className="animate-fade-in-up mx-auto max-w-3xl pt-1 lg:mx-0 lg:max-w-none">
           <TravelResults result={generatedPlan} />
         </div>
       ) : null}
