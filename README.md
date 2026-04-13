@@ -18,7 +18,7 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 ## Environment Variables
 
-Create a `.env.local` file from `.env.example` and set your Gemini + Google Maps API keys:
+Create a `.env.local` file from `.env.example` and set your keys:
 
 ```bash
 cp .env.example .env.local
@@ -26,9 +26,19 @@ cp .env.example .env.local
 
 ```env
 GEMINI_API_KEY=your_gemini_api_key_here
-NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=your_google_maps_api_key_here
 NEXT_PUBLIC_RAZORPAY_KEY_ID=your_razorpay_key_id_here
 ```
+
+## Free map + geocoding
+
+The app uses:
+
+- OpenStreetMap tiles via Leaflet (free)
+- Nominatim geocoding endpoint (free) for place name to coordinates
+
+Nominatim public endpoint:
+
+- `https://nominatim.openstreetmap.org/search?format=json&limit=1&q=YOUR_PLACE`
 
 ## API Route
 
