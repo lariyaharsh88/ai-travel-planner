@@ -5,21 +5,25 @@ export default function Home() {
   return (
     <main className="relative min-h-screen overflow-x-hidden bg-[#faf8f4]">
       <div className="pointer-events-none fixed inset-0 z-0 noise-overlay opacity-[0.55]" aria-hidden />
-      <div className="relative z-10">
-        <HeroSection />
-        <section
-          id="how-it-works"
-          className="mx-auto max-w-6xl px-4 pb-28 pt-10 sm:px-6 sm:pb-16 sm:pt-14"
-        >
-          <div className="mb-10 max-w-2xl">
-            <h2 className="text-xl font-semibold tracking-tight text-stone-900 sm:text-2xl">How it works</h2>
-            <p className="mt-2 text-sm leading-relaxed text-stone-600 sm:text-base">
-              Share your destination, budget, and vibe — we craft a day-wise itinerary with map pins, spend
-              guidance, reel hooks, and a blog-ready draft.
-            </p>
+      <div className="relative z-10 mx-auto max-w-6xl px-4 pb-24 pt-3 sm:px-6 sm:pb-16 sm:pt-4 lg:pb-12 lg:pt-5">
+        <div className="grid grid-cols-1 gap-5 lg:grid-cols-12 lg:gap-8 lg:items-start">
+          <div className="lg:col-span-5">
+            <HeroSection />
           </div>
-          <PlannerShell />
-        </section>
+
+          <section id="how-it-works" className="space-y-4 lg:col-span-7">
+            <div className="max-w-xl lg:pt-0">
+              <h2 className="text-lg font-semibold tracking-tight text-stone-900 sm:text-xl">
+                How it works
+              </h2>
+              <p className="mt-1.5 text-sm leading-relaxed text-stone-600">
+                Share destination, budget, and vibe — we return a day-wise plan, map pins, spend notes, reels, and a
+                blog draft.
+              </p>
+            </div>
+            <PlannerShell />
+          </section>
+        </div>
       </div>
     </main>
   );

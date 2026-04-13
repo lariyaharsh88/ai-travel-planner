@@ -223,7 +223,7 @@ export default function PlannerShell() {
   };
 
   return (
-    <div className="space-y-6 pb-28 sm:pb-10">
+    <div className="space-y-4 pb-28 sm:pb-10">
       <InputForm
         formData={formData}
         setFormData={setFormData}

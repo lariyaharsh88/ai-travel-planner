@@ -62,7 +62,7 @@ export default function InputForm({
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-60px" }}
       transition={{ duration: 0.62, ease: EASE_APPLE }}
-      className="p-5 sm:p-6"
+      className="p-4 sm:p-5"
       hoverLift={5}
     >
       <div
@@ -70,7 +70,7 @@ export default function InputForm({
         aria-hidden
       />
 
-      <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
+      <div className="mb-4 flex flex-wrap items-end justify-between gap-3 sm:mb-5">
         <div>
           <h2 className="text-xl font-semibold tracking-tight text-stone-900 sm:text-2xl">
             Your trip details
@@ -90,7 +90,7 @@ export default function InputForm({
         </motion.span>
       </div>
 
-      <div className="space-y-6">
+      <div className="space-y-4 sm:space-y-5">
         <div className="relative">
           <label
             htmlFor="destination"
