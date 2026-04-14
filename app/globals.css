@@ -35,6 +35,27 @@ body {
   font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
 }
 
+/* Leaflet divIcon: numbered route pins */
+.itinerary-map-pin {
+  background: transparent !important;
+  border: none !important;
+}
+.itinerary-map-pin-inner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 9999px;
+  background: var(--brand-accent, #ff6b35);
+  color: #fff;
+  font-weight: 700;
+  font-size: 12px;
+  line-height: 1;
+  border: 2px solid #fff;
+  box-shadow: 0 2px 10px rgba(15, 23, 42, 0.35);
+}
+
 @layer utilities {
   /* Keyboard: skip to main form */
   .skip-link {

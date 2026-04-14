@@ -13,6 +13,6 @@ export function useCardHoverMotion(lift = 6) {
       y: -lift,
       transition: { duration: 0.52, ease: EASE_APPLE },
     },
-    whileTap: { scale: 0.997, transition: springTap },
+    whileTap: { scale: 0.996, transition: springTap },
   };
 }

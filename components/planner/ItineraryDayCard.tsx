@@ -1,7 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { ChevronDown, Compass, Utensils } from "lucide-react";
+import { ChevronDown, Clock, ExternalLink, Footprints, Sparkles } from "lucide-react";
 import { useState } from "react";
 import { useCardHoverMotion } from "@/hooks/useCardHoverMotion";
 import { EASE_APPLE, springGentle } from "@/lib/motion-premium";
@@ -14,7 +14,7 @@ type ItineraryDayCardProps = {
 
 export default function ItineraryDayCard({ dayPlan, defaultOpen = false }: ItineraryDayCardProps) {
   const [open, setOpen] = useState(defaultOpen);
-  const { whileHover, whileTap } = useCardHoverMotion(4);
+  const { whileHover, whileTap } = useCardHoverMotion(5);
 
   return (
     <motion.article
@@ -22,7 +22,7 @@ export default function ItineraryDayCard({ dayPlan, defaultOpen = false }: Itine
       whileHover={whileHover}
       whileTap={whileTap}
       transition={{ duration: 0.5, ease: EASE_APPLE }}
-      className="group overflow-hidden rounded-2xl border border-stone-200/85 bg-gradient-to-br from-white to-stone-50/80 shadow-[0_10px_36px_-22px_rgba(15,23,42,0.12)] transition-[box-shadow,border-color] duration-500 hover:border-stone-200 hover:shadow-[0_22px_50px_-18px_rgba(15,23,42,0.14)]"
+      className="group overflow-hidden rounded-2xl border border-stone-200/80 bg-gradient-to-br from-white via-white to-stone-50/90 shadow-[0_1px_0_0_rgba(255,255,255,0.8)_inset,0_12px_40px_-12px_rgba(15,23,42,0.08),0_24px_56px_-20px_rgba(15,23,42,0.1)] transition-[box-shadow,border-color,transform] duration-500 hover:border-stone-200 hover:shadow-[0_1px_0_0_rgba(255,255,255,0.9)_inset,0_20px_50px_-16px_rgba(15,23,42,0.12),0_0_0_1px_rgba(255,107,53,0.06)]"
     >
       <button
         type="button"
@@ -37,7 +37,7 @@ export default function ItineraryDayCard({ dayPlan, defaultOpen = false }: Itine
         <motion.span
           animate={{ rotate: open ? 180 : 0 }}
           transition={springGentle}
-          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-stone-200 bg-white text-stone-600 shadow-sm transition-shadow duration-300 group-hover:border-stone-300 group-hover:shadow-md"
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-stone-200/90 bg-white text-stone-600 shadow-[0_2px_8px_-2px_rgba(15,23,42,0.08)] transition-shadow duration-300 group-hover:border-[#FF6B35]/25 group-hover:shadow-[0_4px_14px_-4px_rgba(255,107,53,0.2)]"
         >
           <ChevronDown className="h-5 w-5" strokeWidth={1.75} />
         </motion.span>
@@ -49,52 +49,82 @@ export default function ItineraryDayCard({ dayPlan, defaultOpen = false }: Itine
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.42, ease: EASE_APPLE }}
-            className="border-t border-stone-100"
+            transition={{ duration: 0.45, ease: EASE_APPLE }}
+            className="border-t border-stone-100/90"
           >
-            <div className="grid gap-5 px-4 py-4 sm:grid-cols-2 sm:px-5 sm:py-5">
-              <div>
-                <p className="mb-2 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wider text-stone-500">
-                  <Compass className="h-3.5 w-3.5 text-[#FF6B35]" aria-hidden />
-                  Activities
-                </p>
-                <ul className="space-y-2 text-sm leading-relaxed text-stone-700">
-                  {dayPlan.activities.map((activity) => (
-                    <motion.li
-                      key={activity}
-                      initial={{ opacity: 0, x: -6 }}
-                      whileInView={{ opacity: 1, x: 0 }}
-                      viewport={{ once: true }}
-                      transition={{ duration: 0.35, ease: EASE_APPLE }}
-                      className="flex gap-2"
+            <div className="space-y-4 px-4 py-4 sm:px-5 sm:py-5">
+              {dayPlan.schedule.map((stop, idx) => (
+                <div key={`${dayPlan.day}-${idx}-${stop.place}`}>
+                  <motion.div
+                    initial={{ opacity: 0, x: -8 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.35, ease: EASE_APPLE }}
+                    className="relative rounded-xl border border-stone-100/90 bg-white/80 p-4 shadow-[0_4px_20px_-12px_rgba(15,23,42,0.08)]"
+                  >
+                    <div className="flex flex-wrap items-start justify-between gap-2">
+                      <p className="flex items-center gap-1.5 text-xs font-semibold tabular-nums text-[#FF6B35]">
+                        <Clock className="h-3.5 w-3.5" aria-hidden />
+                        {stop.time}
+                      </p>
+                      {stop.hiddenGem ? (
+                        <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-amber-800 ring-1 ring-amber-200/80">
+                          <Sparkles className="h-3 w-3" aria-hidden />
+                          Hidden gem
+                        </span>
+                      ) : null}
+                    </div>
+                    <h5 className="mt-2 text-sm font-semibold text-stone-900">{stop.activity}</h5>
+                    <p className="mt-0.5 text-sm text-stone-600">{stop.place}</p>
+                    <p className="mt-2 text-xs font-medium text-stone-500">
+                      Est. cost: <span className="text-stone-700">{stop.estimatedCost}</span>
+                    </p>
+                    {stop.localTip ? (
+                      <p className="mt-2 rounded-lg bg-stone-50/90 px-3 py-2 text-xs leading-relaxed text-stone-600">
+                        <span className="font-semibold text-stone-700">Tip: </span>
+                        {stop.localTip}
+                      </p>
+                    ) : null}
+                    <a
+                      href={stop.mapsLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-[#FF6B35] underline-offset-2 hover:underline"
                     >
-                      <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-[#FF6B35]" />
-                      {activity}
-                    </motion.li>
-                  ))}
-                </ul>
-              </div>
-              <div>
-                <p className="mb-2 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wider text-stone-500">
-                  <Utensils className="h-3.5 w-3.5 text-stone-400" aria-hidden />
-                  Places
-                </p>
-                <ul className="space-y-2 text-sm leading-relaxed text-stone-700">
-                  {dayPlan.places.map((place) => (
-                    <motion.li
-                      key={place}
-                      initial={{ opacity: 0, x: -6 }}
-                      whileInView={{ opacity: 1, x: 0 }}
+                      <ExternalLink className="h-3.5 w-3.5" aria-hidden />
+                      Open in Google Maps
+                    </a>
+                  </motion.div>
+
+                  {idx < dayPlan.travelLegs.length ? (
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      whileInView={{ opacity: 1 }}
                       viewport={{ once: true }}
-                      transition={{ duration: 0.35, ease: EASE_APPLE }}
-                      className="flex gap-2"
+                      className="my-3 ml-3 flex gap-3 border-l-2 border-dashed border-stone-200 pl-4"
                     >
-                      <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-stone-400" />
-                      {place}
-                    </motion.li>
-                  ))}
-                </ul>
-              </div>
+                      <Footprints className="mt-0.5 h-4 w-4 shrink-0 text-stone-400" aria-hidden />
+                      <div className="text-xs leading-relaxed text-stone-600">
+                        <p className="font-medium text-stone-700">
+                          {dayPlan.travelLegs[idx].duration}
+                          {dayPlan.travelLegs[idx].mode ? (
+                            <span className="font-normal text-stone-500">
+                              {" "}
+                              · {dayPlan.travelLegs[idx].mode}
+                            </span>
+                          ) : null}
+                        </p>
+                        <p className="text-[11px] text-stone-500">
+                          {dayPlan.travelLegs[idx].fromPlace} → {dayPlan.travelLegs[idx].toPlace}
+                        </p>
+                        {dayPlan.travelLegs[idx].note ? (
+                          <p className="mt-1 text-[11px] text-stone-500">{dayPlan.travelLegs[idx].note}</p>
+                        ) : null}
+                      </div>
+                    </motion.div>
+                  ) : null}
+                </div>
+              ))}
             </div>
           </motion.div>
         ) : null}

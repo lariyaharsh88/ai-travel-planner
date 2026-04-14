@@ -1,14 +1,24 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { MapPinned } from "lucide-react";
-import ItineraryMap from "@/components/ItineraryMap";
 import PremiumInteractiveCard from "@/components/ui/PremiumInteractiveCard";
+import type { MapRoutePoint } from "@/lib/travel-plan";
+
+const ItineraryMap = dynamic(() => import("@/components/ItineraryMap"), {
+  ssr: false,
+  loading: () => (
+    <div className="flex h-52 w-full items-center justify-center rounded-xl border border-stone-100 bg-stone-50/90 text-sm text-stone-500 sm:h-60">
+      Loading map…
+    </div>
+  ),
+});
 
 type MapSectionProps = {
-  places: string[];
+  route: MapRoutePoint[];
 };
 
-export default function MapSection({ places }: MapSectionProps) {
+export default function MapSection({ route }: MapSectionProps) {
   return (
     <PremiumInteractiveCard className="p-5 sm:p-6" hoverLift={6}>
       <div className="pointer-events-none absolute inset-x-0 top-0 z-[2] h-px bg-gradient-to-r from-transparent via-[#FF6B35]/30 to-transparent" />
@@ -18,11 +28,11 @@ export default function MapSection({ places }: MapSectionProps) {
         </span>
         <div>
           <h3 className="text-lg font-semibold text-stone-900">Itinerary map</h3>
-          <p className="text-xs text-stone-500">Pins from your day plan (OpenStreetMap)</p>
+          <p className="text-xs text-stone-500">Route line + numbered pins in trip order (OpenStreetMap)</p>
         </div>
       </div>
       <div className="overflow-hidden rounded-2xl border border-stone-100 shadow-inner transition-shadow duration-500 group-hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.6)]">
-        <ItineraryMap places={places} />
+        <ItineraryMap route={route} />
       </div>
     </PremiumInteractiveCard>
   );

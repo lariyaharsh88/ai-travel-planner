@@ -21,6 +21,10 @@ export default function ReelCarousel({ ideas }: ReelCarouselProps) {
     setTimeout(() => setCopiedIndex(null), 1600);
   };
 
+  if (ideas.length === 0) {
+    return null;
+  }
+
   return (
     <PremiumInteractiveCard className="p-5 sm:p-6" hoverLift={5}>
       <div className="mb-4 flex items-center gap-2">
@@ -29,7 +33,7 @@ export default function ReelCarousel({ ideas }: ReelCarouselProps) {
         </span>
         <div>
           <h3 className="text-lg font-semibold text-stone-900">Reel ideas</h3>
-          <p className="text-xs text-stone-500">Swipe for hooks & captions</p>
+          <p className="text-xs text-stone-500">Short-form hooks, captions & hashtags — ready to shoot</p>
         </div>
       </div>
 

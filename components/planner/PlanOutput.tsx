@@ -7,10 +7,12 @@ import ItineraryPdfDocument from "@/components/ItineraryPdfDocument";
 import BlogSection from "@/components/planner/BlogSection";
 import BudgetSection from "@/components/planner/BudgetSection";
 import ItineraryDayCard from "@/components/planner/ItineraryDayCard";
+import InstagramSpotsSection from "@/components/planner/InstagramSpotsSection";
 import MapSection from "@/components/planner/MapSection";
+import PhotoAnglesSection from "@/components/planner/PhotoAnglesSection";
 import ReelCarousel from "@/components/planner/ReelCarousel";
 import { EASE_APPLE } from "@/lib/motion-premium";
-import type { TravelPlanResponse } from "@/lib/travel-plan";
+import { itineraryRouteForMap, type TravelPlanResponse } from "@/lib/travel-plan";
 
 type PlanOutputProps = {
   result: TravelPlanResponse;
@@ -19,34 +21,41 @@ type PlanOutputProps = {
 const list = {
   visible: {
     transition: {
-      staggerChildren: 0.09,
-      delayChildren: 0.04,
+      staggerChildren: 0.1,
+      delayChildren: 0.08,
     },
   },
   hidden: {},
 };
 
 const item = {
-  hidden: { opacity: 0, y: 22 },
+  hidden: { opacity: 0, y: 28 },
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.58, ease: EASE_APPLE },
+    transition: { duration: 0.62, ease: EASE_APPLE },
+  },
+};
+
+const dayCardStagger = {
+  visible: {
+    transition: { staggerChildren: 0.085, delayChildren: 0.06 },
+  },
+  hidden: {},
+};
+
+const dayCardItem = {
+  hidden: { opacity: 0, y: 16, scale: 0.98 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: { duration: 0.48, ease: EASE_APPLE },
   },
 };
 
 export default function PlanOutput({ result }: PlanOutputProps) {
-  const itineraryPlaces = useMemo(
-    () =>
-      Array.from(
-        new Set(
-          result.dayWisePlan.flatMap((dayPlan) =>
-            dayPlan.places.map((place) => place.trim()).filter(Boolean),
-          ),
-        ),
-      ),
-    [result.dayWisePlan],
-  );
+  const mapRoute = useMemo(() => itineraryRouteForMap(result), [result]);
 
   return (
     <motion.section
@@ -57,22 +66,24 @@ export default function PlanOutput({ result }: PlanOutputProps) {
     >
       <div className="flex flex-col items-stretch justify-between gap-3 sm:flex-row sm:items-center">
         <motion.div
-          initial={{ opacity: 0, y: 12 }}
+          initial={{ opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.55, ease: EASE_APPLE }}
         >
           <h2 className="text-2xl font-semibold tracking-tight text-stone-900">Your trip</h2>
-          <p className="mt-1 text-sm text-stone-500">Itinerary, map, budget, and content kit</p>
+          <p className="mt-1 text-sm text-stone-500">
+            Itinerary, map, budget, reels, Instagram spots & photo angles
+          </p>
         </motion.div>
         <motion.div
-          whileHover={{ scale: 1.02, transition: { duration: 0.4, ease: EASE_APPLE } }}
+          whileHover={{ scale: 1.03, y: -2, transition: { duration: 0.35, ease: EASE_APPLE } }}
           whileTap={{ scale: 0.98 }}
           className="inline-flex self-start sm:self-auto"
         >
           <PDFDownloadLink
             document={<ItineraryPdfDocument result={result} />}
             fileName="epic-india-itinerary.pdf"
-            className="inline-flex items-center justify-center rounded-2xl border border-stone-200 bg-white px-5 py-2.5 text-sm font-semibold text-stone-900 shadow-sm transition-[box-shadow,border-color] duration-500 hover:border-[#FF6B35]/30 hover:shadow-[0_12px_32px_-12px_rgba(15,23,42,0.12)]"
+            className="inline-flex items-center justify-center rounded-2xl border border-stone-200/90 bg-white px-5 py-2.5 text-sm font-semibold text-stone-900 shadow-[0_8px_24px_-12px_rgba(15,23,42,0.12)] transition-[box-shadow,border-color] duration-500 hover:border-[#FF6B35]/35 hover:shadow-[0_16px_40px_-14px_rgba(255,107,53,0.18)]"
           >
             {({ loading }) => (loading ? "Preparing PDF…" : "Download PDF")}
           </PDFDownloadLink>
@@ -85,15 +96,17 @@ export default function PlanOutput({ result }: PlanOutputProps) {
             <h3 className="text-lg font-semibold text-stone-900">Day-by-day itinerary</h3>
             <p className="text-xs text-stone-500">Tap to expand each day</p>
           </div>
-          <div className="grid gap-3">
+          <motion.div variants={dayCardStagger} initial="hidden" animate="visible" className="grid gap-3">
             {result.dayWisePlan.map((dayPlan, i) => (
-              <ItineraryDayCard key={dayPlan.day} dayPlan={dayPlan} defaultOpen={i === 0} />
+              <motion.div key={dayPlan.day} variants={dayCardItem}>
+                <ItineraryDayCard dayPlan={dayPlan} defaultOpen={i === 0} />
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         </motion.div>
 
         <motion.div variants={item}>
-          <MapSection places={itineraryPlaces} />
+          <MapSection route={mapRoute} />
         </motion.div>
 
         <motion.div variants={item}>
@@ -102,6 +115,14 @@ export default function PlanOutput({ result }: PlanOutputProps) {
 
         <motion.div variants={item}>
           <ReelCarousel ideas={result.reelIdeas} />
+        </motion.div>
+
+        <motion.div variants={item}>
+          <InstagramSpotsSection spots={result.instagramSpots} />
+        </motion.div>
+
+        <motion.div variants={item}>
+          <PhotoAnglesSection angles={result.photoAngles} />
         </motion.div>
 
         <motion.div variants={item}>

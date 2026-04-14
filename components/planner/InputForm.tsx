@@ -207,7 +207,9 @@ export default function InputForm({
         {isLoading ? (
           <>
             <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/25 border-t-white" />
-            Crafting your trip…
+            {formData.destination.trim()
+              ? `Planning your ${formData.destination.trim()} trip…`
+              : "Planning your trip…"}
           </>
         ) : (
           "Generate my plan"
