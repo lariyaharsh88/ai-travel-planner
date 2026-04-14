@@ -416,7 +416,7 @@ export default function ItineraryPdfDocument({
       {/* Cover */}
       <Page size="A4" style={{ padding: 0 }}>
         <View style={styles.coverPage}>
-          <Image style={styles.coverImage} src={coverSrc} alt="" />
+          <Image style={styles.coverImage} src={coverSrc} />
           <View style={styles.coverScrim} />
           <View style={styles.coverInner}>
             <Text style={styles.coverKicker}>Travel itinerary</Text>
