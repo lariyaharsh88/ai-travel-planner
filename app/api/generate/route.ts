@@ -63,10 +63,16 @@ function isNonEmptyString(v: unknown): v is string {
   return typeof v === "string" && v.trim().length > 0;
 }
 
-function normalizeStop(
-  raw: unknown,
-  destination: string,
-): ScheduleStop {
+/** Prefer INR symbol in cost strings */
+function normalizeInrCostString(raw: string): string {
+  const t = raw.trim();
+  if (/[₹]|INR|inr|rupee/i.test(t)) return t;
+  if (/^free$/i.test(t)) return t;
+  if (/^\d/.test(t)) return `₹${t}`;
+  return t;
+}
+
+function normalizeStop(raw: unknown, destination: string): ScheduleStop {
   if (!raw || typeof raw !== "object") {
     throw new Error("Invalid schedule stop");
   }
@@ -83,14 +89,27 @@ function normalizeStop(
   if (!mapsLink.startsWith("http")) {
     mapsLink = mapsSearchUrlForPlace(s.place, destination);
   }
+  const timeSlot =
+    isNonEmptyString(s.timeSlot) && s.timeSlot.trim().length > 0
+      ? s.timeSlot.trim()
+      : `${s.time.trim()} – (set end time)`;
+  const localTip =
+    isNonEmptyString(s.localTip) && s.localTip.trim().length > 0
+      ? s.localTip.trim()
+      : "Crowd, entry, and local pitfalls: confirm at the venue the same day — avoid rush if lines look long.";
+  const localInsight =
+    isNonEmptyString(s.localInsight) && s.localInsight.trim().length > 0
+      ? s.localInsight.trim()
+      : undefined;
+
   return {
     time: s.time.trim(),
-    timeSlot: isNonEmptyString(s.timeSlot) ? s.timeSlot.trim() : undefined,
+    timeSlot,
     activity: s.activity.trim(),
     place: s.place.trim(),
-    estimatedCost: s.estimatedCost.trim(),
-    localTip: isNonEmptyString(s.localTip) ? s.localTip.trim() : undefined,
-    localInsight: isNonEmptyString(s.localInsight) ? s.localInsight.trim() : undefined,
+    estimatedCost: normalizeInrCostString(s.estimatedCost),
+    localTip,
+    localInsight,
     mapsLink,
     hiddenGem: typeof s.hiddenGem === "boolean" ? s.hiddenGem : undefined,
   };
@@ -100,7 +119,7 @@ function normalizeLeg(raw: unknown): TravelLeg {
   if (!raw || typeof raw !== "object") {
     throw new Error("Invalid travel leg");
   }
-  const l = raw as Partial<TravelLeg>;
+  const l = raw as Partial<TravelLeg> & { alternatives?: string };
   if (
     !isNonEmptyString(l.fromPlace) ||
     !isNonEmptyString(l.toPlace) ||
@@ -108,15 +127,20 @@ function normalizeLeg(raw: unknown): TravelLeg {
   ) {
     throw new Error("Travel leg missing fromPlace, toPlace, or duration");
   }
+  const distanceRaw = isNonEmptyString(l.distance) ? l.distance.trim() : "";
+  const distance =
+    distanceRaw.length > 0 ? distanceRaw : "~2 km (estimate — model should return real km)";
+
   return {
     fromPlace: l.fromPlace.trim(),
     toPlace: l.toPlace.trim(),
     duration: l.duration.trim(),
-    distance: isNonEmptyString(l.distance) ? l.distance.trim() : undefined,
-    mode: isNonEmptyString(l.mode) ? l.mode.trim() : undefined,
-    route: isNonEmptyString(l.route) ? l.route.trim() : undefined,
-    legCost: isNonEmptyString(l.legCost) ? l.legCost.trim() : undefined,
+    distance,
+    mode: isNonEmptyString(l.mode) ? l.mode.trim() : "Auto / cab / walk (pick one for this leg)",
+    route: isNonEmptyString(l.route) ? l.route.trim() : "Use maps for the fastest path between these pins.",
+    legCost: isNonEmptyString(l.legCost) ? normalizeInrCostString(l.legCost) : "₹0–150 (mode-dependent)",
     note: isNonEmptyString(l.note) ? l.note.trim() : undefined,
+    alternatives: isNonEmptyString(l.alternatives) ? l.alternatives.trim() : undefined,
   };
 }
 
@@ -186,7 +210,7 @@ function normalizeDayPlan(day: unknown, destination: string): DayPlan {
 
   const hasSchedule = Array.isArray(d.schedule) && d.schedule.length > 0;
   if (!hasSchedule) {
-    return coerceLegacyDay(day, destination);
+    return enforceDayPlanConstraints(coerceLegacyDay(day, destination));
   }
 
   const schedule = d.schedule!.map((s) => normalizeStop(s, destination));
@@ -219,7 +243,7 @@ function normalizeDayPlan(day: unknown, destination: string): DayPlan {
     }
   }
 
-  return {
+  const base: DayPlan = {
     day: typeof d.day === "number" && Number.isFinite(d.day) ? d.day : 1,
     title: isNonEmptyString(d.title) ? d.title.trim() : `Day ${d.day ?? 1}`,
     schedule,
@@ -227,6 +251,44 @@ function normalizeDayPlan(day: unknown, destination: string): DayPlan {
     estimatedDayCost: isNonEmptyString(d.estimatedDayCost)
       ? d.estimatedDayCost.trim()
       : undefined,
+  };
+  return enforceDayPlanConstraints(base);
+}
+
+/** Exactly two hidden gems per day when ≥2 stops; trim extras; fill shortage. */
+function enforceDayPlanConstraints(day: DayPlan): DayPlan {
+  let schedule = day.schedule.map((s) => ({ ...s }));
+  if (schedule.length >= 2) {
+    const hiddenCount = schedule.filter((s) => s.hiddenGem === true).length;
+    if (hiddenCount > 2) {
+      let kept = 0;
+      schedule = schedule.map((s) => {
+        if (!s.hiddenGem) return s;
+        kept++;
+        if (kept <= 2) return s;
+        return { ...s, hiddenGem: false };
+      });
+    } else if (hiddenCount < 2) {
+      let need = 2 - hiddenCount;
+      for (let i = 0; i < schedule.length && need > 0; i++) {
+        if (!schedule[i].hiddenGem) {
+          schedule[i] = { ...schedule[i], hiddenGem: true };
+          need--;
+        }
+      }
+    }
+  }
+
+  let estimatedDayCost = day.estimatedDayCost;
+  if (!isNonEmptyString(estimatedDayCost ?? "")) {
+    estimatedDayCost =
+      "Total this day: add per-stop ₹ in schedule + leg fares below (hotel excluded unless stated).";
+  }
+
+  return {
+    ...day,
+    schedule,
+    estimatedDayCost,
   };
 }
 
@@ -290,8 +352,11 @@ function normalizePhotoAngle(raw: unknown): PhotoAngle | null {
   ) {
     return null;
   }
+  const shotType =
+    isNonEmptyString(x.shotType) && x.shotType.trim().length > 0 ? x.shotType.trim() : undefined;
   return {
     spot: x.spot.trim(),
+    ...(shotType ? { shotType } : {}),
     angle: x.angle.trim(),
     composition: x.composition.trim(),
     lighting: x.lighting.trim(),
@@ -386,143 +451,95 @@ export async function POST(request: Request) {
     const modeBlock =
       planMode === "creator"
         ? `
-CREATOR / INSTAGRAM MODE (primary deliverable — optimize for posting):
-- Best photo spots: "instagramSpots" must be ≥8. Each card needs a sharp "shotIdea", "whyItWorks" that sounds like a creator brief (not generic), and a mapsLink.
-- Reel hooks: "reelIdeas" must be ≥6. Every "hook" must be scroll-stopping and tied to a named stop or time window from this itinerary; captions should suggest how to shoot it.
-- Camera angles: "photoAngles" must be ≥8. Each row must include concrete "angle" (lens / height / POV) and "composition" (rule of thirds, leading lines, foreground frame, etc.).
-- Best time for lighting: every "instagramSpots"."bestTime" must name a real lighting window for THAT place (golden hour, blue hour, open shade window, when backlight hits a facade, etc.). Every "photoAngles"."lighting" must echo the best time + direction of light when relevant.
-- Cross-link: where possible, reference which day or stop matches each reel, spot, or angle.
+SECONDARY — Creator Mode (must be feed-ready; after itinerary is solid):
+- "instagramSpots": ≥8; each must name a REAL place on the route; "whyItWorks" = color/symmetry/vibe; "bestTime" MUST name lighting windows (golden hour, blue hour, sunset, harsh midday to avoid, etc.) for THIS place.
+- "reelIdeas": ≥6; each MUST have: hook (scroll-stopping opener), caption (IG-ready), "script" non-empty (beats + shot list); tie to named stops/times.
+- "photoAngles": ≥9; each row MUST include "shotType" exactly one of: "Wide" | "Drone" | "POV" (rotate across rows so all three appear multiple times); "angle" = lens/height feel; "lighting" = best time for that frame (golden hour, sunset, etc.).
 `
         : `
-NORMAL PLAN MODE (itinerary-first):
-- Prioritize a realistic day-by-day schedule, travelLegs, mapsLink accuracy, and budgetBreakdown.
-- CONTENT KIT (secondary, shorter): "reelIdeas" ≥3, "instagramSpots" ≥3, "photoAngles" ≥4 — still specific and tied to named places; avoid fluff padding.
+SECONDARY — Creator kit (lighter — user did not choose Creator Mode in UI):
+- "reelIdeas": ≥3; "instagramSpots": ≥3; "photoAngles": ≥4; keep "shotType" optional; still tie to named places.
 `;
 
     const prompt = `
-You are a senior destination specialist (India + worldwide). Your output must read like a paid concierge brief: hyper-specific, navigable in the real world, and impossible to mistake for generic AI filler.
-
-Destination: ${dest}
-Budget (INR or local context): ${body.budget}
-Trip length: ${body.days} days
-Travel style: ${body.style}
-Interests: ${body.interests.join(", ")}
-Plan mode: ${planMode === "creator" ? "Creator (Instagram-forward)" : "Normal (trip-first)"}
+You are a LOCAL expert trip planner (not a generic travel blog). Write ONLY for this destination: ${dest}.
+Trip: ${body.days} day(s). Budget context (INR): ${body.budget}. Style: ${body.style}. Interests: ${body.interests.join(", ")}.
+Plan mode: ${planMode === "creator" ? "Creator (extra content below)" : "Trip-first"}.
 ${modeBlock}
 
-ANTI-GENERIC RULES (critical):
-- Do NOT use vague filler: no "explore the local culture", "enjoy the scenery", "famous landmark", "authentic experience" without naming WHAT/WHERE/WHEN/WHY.
-- Every "activity" must name a concrete action + venue/area (e.g. "Thali lunch at ___", "Sunset from ___ ridge", not "Visit old town").
-- Every "localInsight" (required on at least half of all stops) must be a hyper-specific nugget: named stall, dish, neighborhood habit, price reality, or local nickname — NOT advice that applies to any city.
+PRIMARY OUTPUT — REAL-WORLD ITINERARY (this is what matters):
+1) DAYS: Produce exactly ${body.days} day object(s) in "dayWisePlan", "day" = 1..${body.days}.
+2) TIME SLOTS: Every stop MUST have:
+   - "time" = start time (e.g. "9:00 AM").
+   - "timeSlot" = full inclusive block using an en dash or hyphen, e.g. "9:00 AM – 11:00 AM" (never "morning only").
+   Schedules must be physically possible: no overlapping timeSlots; travel time between stops must fit in the gaps.
+3) STOPS: Each stop must be a concrete ACTION at a NAMED place (venue, neighborhood, or landmark). Banned phrases: "explore the local culture", "enjoy the scenery", "famous landmark", "authentic experience" without naming WHAT/WHERE.
+4) COSTS (INR): Every stop MUST have "estimatedCost" with ₹ symbol (e.g. "₹120 entry", "₹450 for two", "Free"). Prefer single numbers or tight ranges; say what it covers.
+5) HIDDEN GEMS: On EACH day with at least 2 stops, mark EXACTLY TWO different stops with "hiddenGem": true. Those must be real, non-touristy picks (local market lane, neighbourhood cafe, viewpoint locals use — NOT the same mega-attraction twice). All other stops "hiddenGem": false.
+6) INSIDER TIPS — Every stop MUST have "localTip" (non-empty string) that includes ALL of:
+   - Crowd timing (when to go or when to avoid),
+   - Best entry window (e.g. gate opens, queue pattern),
+   - One scam/pitfall or common rip-off to avoid at THIS place (if none, say "No common scam here — still pay metered auto / use official counter only").
+   Also include "localInsight" on every stop: one hyper-specific detail (named dish, stall, price band, or neighbourhood habit).
+7) TOTAL DAILY COST: Each day MUST include "estimatedDayCost": one line in INR totalling that day's stops + legs (exclude hotel for multi-day unless you explicitly fold a night stay into that day).
+8) TRAVEL BETWEEN STOPS: For every consecutive pair of stops, one "travelLeg" (length = schedule.length - 1). Each leg MUST include:
+   - "duration" — realistic total time (e.g. "~35 min" including wait).
+   - "distance" — distance in km or metres for walks, e.g. "~4.2 km" or "~650 m walk".
+   - "mode" — PRIMARY mode for this leg: one of "Walk", "Auto", "App cab", "Metro", "Bus", "Bike rental", "Ferry", "Train" (pick what fits).
+   - "alternatives" — one line suggesting other realistic options (e.g. "Auto ₹60–90 vs Metro ₹20 · 25 min walk if you prefer").
+   - "route" — navigable detail: road names, metro line + station, or walking landmarks.
+   - "legCost" — INR for this leg only.
+   - "note" — traffic/rush hour or crowd risk (specific hours if relevant).
 
-QUALITY BAR (+perceived quality — follow strictly):
-1) EXACT TIMINGS: Every stop must have precise "time" (start) AND "timeSlot" (full block). timeSlot must encode real duration (e.g. "9:15–10:40 AM"), not vague "morning". Activities must be schedulable back-to-back with travel legs — no overlapping impossible blocks.
-2) TRAVEL DISTANCE + TIME: Every "travelLeg" MUST include BOTH "duration" (total time, e.g. "~28 min") AND "distance" (approximate, e.g. "~4.2 km by road" or "~850 m walk"). Use realistic pairs for the mode.
-3) LOCAL TIPS (crowd + best time): Every "localTip" MUST weave in practical specifics for THIS stop: how to avoid crowds OR quieter windows (e.g. "before 10:30 queues are short"), AND best time to visit or order when relevant. Never generic "arrive early" without a concrete window or entrance.
-4) TWO HIDDEN PLACES PER DAY: Each day MUST mark exactly two different schedule stops with "hiddenGem": true (real lesser-known spots — not the same famous icon twice). Other stops "hiddenGem": false. If a day has fewer than 2 stops total, mark all that apply as hidden gems and note in narrative — prefer adding enough stops so two hidden gems are possible.
-5) ESTIMATED COST PER DAY: Each day object MUST include "estimatedDayCost": one line totaling that day's activities, entries, meals, and local transport (exclude whole-trip hotel unless it's a single-day or you state it clearly), e.g. "₹2,400–2,800 for day (meals + entries + local hops)".
+MAPS: Every "mapsLink" must be a full https://www.google.com/maps/ URL for that stop.
 
-TIME SLOTS:
-- "time" = exact start time (e.g. "9:15 AM") for ordering.
-- "timeSlot" = full inclusive block (REQUIRED on every stop), e.g. "9:15–10:45 AM". Duration inside timeSlot must match the activity type (meal ~45–75 min, major sight ~60–120 min, quick stop ~20–45 min).
-
-COSTS (per activity):
-- "estimatedCost" must prefer EXACT or near-exact numbers: "₹220 for two", "₹50 entry", "₹35 thali", "Free". Tight ranges only when necessary and say what they cover.
-
-TRAVEL ROUTES (every leg — all fields mandatory except note when N/A):
-- Each "travelLeg" MUST include:
-  - "duration" — total time for the leg (required).
-  - "distance" — approximate distance for this leg (required), e.g. "~3.1 km" or "~700 m walk".
-  - "mode" (Walk / Metro / Bus / Auto-rickshaw / Taxi / Ferry / Train as appropriate),
-  - "route" = CONCRETE navigation: named roads, metro lines + stations, bus numbers, or landmark-to-landmark walking path.
-  - "legCost" = fare for THIS leg only (e.g. "₹20 ×2", "₹180 Uber", "₹0 walking").
-  - "note" = traffic, crowd, or time risk (specific hours).
-
-Maps:
-- Every stop "mapsLink": full https://www.google.com/maps/ URL.
-${
-  planMode === "creator"
-    ? `- CONTENT KIT (Creator thresholds — do not go below):
-  - "reelIdeas": ≥6; hooks tied to named stops / times on this trip.
-  - "instagramSpots": ≥8; "photoAngles": ≥8; tie to real places, light, and camera intent.`
-    : `- CONTENT KIT (Normal thresholds):
-  - "reelIdeas": ≥3; "instagramSpots": ≥3; "photoAngles": ≥4 — concise but specific.`
-}
-
-Return ONLY valid JSON with this exact shape:
+Return ONLY valid JSON (no markdown, no commentary) with this schema:
 {
   "dayWisePlan": [
     {
       "day": 1,
-      "title": "Short catchy day title",
-      "estimatedDayCost": "₹X–Y total this day (meals + entries + local transport — see rules)",
+      "title": "string",
+      "estimatedDayCost": "₹X–Y total this day (breakdown in stops)",
       "schedule": [
         {
           "time": "9:00 AM",
-          "timeSlot": "9:00–10:30 AM",
-          "activity": "Concrete action + named place",
-          "place": "Venue or area — specific",
-          "estimatedCost": "₹exact or tight + what it covers",
-          "localTip": "Crowd + best-time specifics for THIS place (required)",
-          "localInsight": "Hyper-specific nugget",
+          "timeSlot": "9:00 AM – 11:00 AM",
+          "activity": "string",
+          "place": "string",
+          "estimatedCost": "₹…",
+          "localTip": "crowd + entry + scam/pitfall for THIS place",
+          "localInsight": "named insider detail",
           "mapsLink": "https://www.google.com/maps/...",
           "hiddenGem": false
         }
       ],
       "travelLegs": [
         {
-          "fromPlace": "Exact name",
-          "toPlace": "Exact name",
-          "duration": "~22 min total",
+          "fromPlace": "string",
+          "toPlace": "string",
+          "duration": "~22 min",
           "distance": "~3.2 km",
-          "mode": "Metro",
-          "route": "Named lines/stations/roads/exits — navigable detail",
-          "legCost": "₹… or Free",
-          "note": "Traffic/crowd/time caveat"
+          "mode": "Auto",
+          "alternatives": "App cab · Metro line X · walk",
+          "route": "concrete navigation",
+          "legCost": "₹…",
+          "note": "rush hour / risk"
         }
       ]
     }
   ],
-  "budgetBreakdown": {
-    "stay": "string",
-    "food": "string",
-    "transport": "string"
-  },
-  "reelIdeas": [
-    {
-      "hook": "string",
-      "script": "5–10 shot beats or lines to say on camera (specific to this place)",
-      "caption": "string",
-      "hashtags": ["#one", "#two"]
-    }
-  ],
-  "instagramSpots": [
-    {
-      "place": "Specific place name",
-      "whyItWorks": "Why it pops on the feed",
-      "bestTime": "Best light / time window",
-      "shotIdea": "One actionable shot",
-      "mapsLink": "https://www.google.com/maps/..."
-    }
-  ],
-  "photoAngles": [
-    {
-      "spot": "Where to stand",
-      "angle": "Camera angle / lens feel",
-      "composition": "How to frame",
-      "lighting": "Light & time"
-    }
-  ],
+  "budgetBreakdown": { "stay": "string", "food": "string", "transport": "string" },
+  "reelIdeas": [{ "hook": "string", "script": "string", "caption": "string", "hashtags": ["#a"] }],
+  "instagramSpots": [{ "place": "string", "whyItWorks": "string", "bestTime": "string", "shotIdea": "string", "mapsLink": "https://..." }],
+  "photoAngles": [{ "spot": "string", "shotType": "Wide | Drone | POV", "angle": "string", "composition": "string", "lighting": "string" }],
   "blogContent": {
     "title": "string",
     "preview": "string",
-    "seoSections": [
-      { "heading": "H2-style section title", "body": "2–4 sentences with keywords" }
-    ]
+    "seoSections": [{ "heading": "string", "body": "string" }]
   }
 }
 
-Rules: travelLegs length must equal schedule.length - 1 (use empty array if only one stop). Include instagramSpots and photoAngles arrays (never omit). Every schedule item MUST include "timeSlot". Every travelLeg MUST include "distance", "route", and "legCost" (use "₹0" or "Free" if walking). Each day MUST have "estimatedDayCost" and exactly two stops with "hiddenGem": true when schedule length ≥ 2. Every "reelIdeas" item MUST include a non-empty "script" (shot list / beat sheet). "blogContent.seoSections" MUST include 3–5 H2-style sections with keyword-rich body copy. No markdown outside JSON.
+Hard rules: travelLegs.length === schedule.length - 1 per day. "instagramSpots" and "photoAngles" arrays must exist. Every "reelIdeas" item MUST include "script". "blogContent.seoSections" MUST have 3–5 sections. Two "hiddenGem": true per day when schedule has ≥2 stops.
 `.trim();
 
     const model = process.env.GROQ_MODEL ?? "llama-3.1-8b-instant";
@@ -540,15 +557,15 @@ Rules: travelLegs length must equal schedule.length - 1 (use empty array if only
             role: "system",
             content:
               planMode === "creator"
-                ? "You are a senior travel concierge and viral content strategist. Output only valid JSON. Every day must include exact timings, leg distances + times, two hidden gems, estimated day cost, and crowd/best-time tips — plus photo/reel content. Reject vague travel-blog language."
-                : "You are a senior travel concierge. Output only valid JSON. Every day must include exact timings, leg distances + times, two hidden gems per day, estimated day cost, and actionable local tips. Reject generic travel-blog language. Include a lighter but still useful content kit.",
+                ? "You are a local expert trip planner for India + worldwide. Output ONLY valid JSON. No markdown. Prioritize a hyper-practical day-by-day schedule: exact timeSlots, INR costs, travel legs with km + time + mode + alternatives, two real hidden gems per day, and insider tips (crowd, entry, scams). Then fill creator fields. Reject generic travel-blog filler."
+                : "You are a local expert trip planner. Output ONLY valid JSON. No markdown. Every day: exact timeSlots (e.g. 9:00 AM – 11:00 AM), INR per activity, legs with km/duration/mode/alternatives, total daily cost, two hidden gems per day, and insider tips (crowd, entry, scams). Then a lighter creator kit. Reject vague language.",
           },
           {
             role: "user",
             content: prompt,
           },
         ],
-        temperature: 0.48,
+        temperature: 0.38,
       }),
     });
 

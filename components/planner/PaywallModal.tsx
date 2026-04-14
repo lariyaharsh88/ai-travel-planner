@@ -2,6 +2,7 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import { Check } from "lucide-react";
+import UnlockPremiumButton from "@/components/planner/UnlockPremiumButton";
 import { EASE_APPLE } from "@/lib/motion-premium";
 
 type PaywallModalProps = {
@@ -12,10 +13,11 @@ type PaywallModalProps = {
 };
 
 const FEATURES = [
-  { title: "Hidden gems", detail: "Lesser-known stops and local picks woven into your route" },
-  { title: "Creator mode", detail: "Reel scripts, Instagram spots, and photo angles tied to real places" },
-  { title: "PDF export", detail: "Print-ready itinerary with cover and budget summary" },
-  { title: "Full budget breakdown", detail: "Day-wise feel plus stay, food, and transport snapshot" },
+  { title: "Full itinerary", detail: "Every day, stop, and leg — not just the preview" },
+  { title: "Hidden gems", detail: "Off-path picks marked in your route" },
+  { title: "Creator Mode", detail: "Reels, IG spots, angles & light when you chose Creator" },
+  { title: "Budget breakdown", detail: "Stay, food & transport in clear INR lines" },
+  { title: "PDF download", detail: "Print-ready doc with cover & summary" },
 ] as const;
 
 export default function PaywallModal({ open, onClose, onUnlock, isPaying }: PaywallModalProps) {
@@ -24,7 +26,7 @@ export default function PaywallModal({ open, onClose, onUnlock, isPaying }: Payw
       {open ? (
         <motion.div
           key="upgrade-backdrop"
-          className="fixed inset-0 z-50 flex items-center justify-center bg-stone-950/50 p-4 backdrop-blur-md"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-stone-950/55 p-4 backdrop-blur-md"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -44,16 +46,16 @@ export default function PaywallModal({ open, onClose, onUnlock, isPaying }: Payw
             onClick={(e) => e.stopPropagation()}
           >
             <div
-              className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-amber-200 via-[#FF6B35] to-amber-200"
+              className="absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-amber-300 via-[#FF6B35] to-violet-400"
               aria-hidden
             />
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-stone-500">EpicIndiaTrips AI Planner</p>
             <h3 id="paywall-title" className="mt-2 text-2xl font-semibold tracking-tight text-stone-900">
-              Unlock Premium Plan
+              Unlock Premium Travel Plan
             </h3>
             <p className="mt-3 text-sm leading-relaxed text-stone-600">
-              You&apos;ve used today&apos;s complimentary generation. Get the full experience — the same briefing flow,
-              with everything below included.
+              You&apos;ve hit the limit for today&apos;s free preview — or you want the full experience. One payment
+              unlocks everything below for your account.
             </p>
 
             <ul className="mt-6 space-y-3 rounded-2xl border border-stone-200/80 bg-[#fafaf9] px-4 py-4">
@@ -68,7 +70,7 @@ export default function PaywallModal({ open, onClose, onUnlock, isPaying }: Payw
               ))}
             </ul>
 
-            <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center">
               <button
                 type="button"
                 onClick={onClose}
@@ -76,20 +78,19 @@ export default function PaywallModal({ open, onClose, onUnlock, isPaying }: Payw
               >
                 Maybe later
               </button>
-              <button
-                type="button"
-                onClick={onUnlock}
-                disabled={isPaying}
-                className="w-full rounded-2xl bg-[#14120f] px-4 py-3 text-sm font-semibold text-white shadow-[0_8px_24px_-8px_rgba(15,23,42,0.35)] transition hover:bg-[#1c1917] disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                {isPaying ? "Opening secure checkout…" : "Unlock Premium Plan"}
-              </button>
+              <div className="flex w-full justify-center sm:justify-end">
+                <UnlockPremiumButton
+                  onClick={onUnlock}
+                  disabled={isPaying}
+                  className={isPaying ? "pointer-events-none opacity-60" : ""}
+                >
+                  {isPaying ? "Opening secure checkout…" : "Unlock Premium Travel Plan"}
+                </UnlockPremiumButton>
+              </div>
             </div>
 
-            <p className="mt-4 text-center text-[11px] leading-relaxed text-stone-400">
-              One-time unlock · secure checkout
-              <span className="text-stone-300"> · </span>
-              <span className="font-semibold text-stone-600">₹99</span>
+            <p className="mt-5 text-center text-[11px] leading-relaxed text-stone-400">
+              <span className="font-semibold text-stone-600">₹99</span> one-time · Razorpay · instant access after payment
             </p>
           </motion.div>
         </motion.div>

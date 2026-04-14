@@ -1,5 +1,6 @@
 import CreatorHookStrip from "@/components/CreatorHookStrip";
 import HomeMotionGrid from "@/components/HomeMotionGrid";
+import HomeSidebarLayout from "@/components/HomeSidebarLayout";
 import HeroSection from "@/components/HeroSection";
 import HowItWorksIntro from "@/components/HowItWorksIntro";
 import PageEnter from "@/components/PageEnter";
@@ -17,18 +18,16 @@ export default function Home() {
         aria-hidden
       />
       <div className="pointer-events-none fixed inset-0 z-0 noise-overlay opacity-[0.22]" aria-hidden />
-      <PageEnter className="relative z-10 mx-auto max-w-6xl px-5 pb-32 pt-6 sm:px-8 sm:pb-24 sm:pt-8 lg:max-w-[72rem] lg:pb-20 lg:pt-10">
+      <PageEnter className="relative z-10 mx-auto max-w-6xl px-4 pb-[calc(7.5rem+env(safe-area-inset-bottom,0px))] pt-6 sm:px-8 sm:pb-28 sm:pt-10 lg:max-w-[72rem] lg:pb-24 lg:pt-12">
         <HomeMotionGrid
           hero={<HeroSection />}
           sidebar={
-            <section
-              id="how-it-works"
-              aria-labelledby="how-it-works-heading"
-              className="flex min-h-0 flex-col space-y-5"
-            >
-              <HowItWorksIntro />
-              <CreatorHookStrip />
-              <PlannerShell />
+            <section id="how-it-works" aria-labelledby="how-it-works-heading" className="min-h-0">
+              <HomeSidebarLayout>
+                <HowItWorksIntro />
+                <CreatorHookStrip />
+                <PlannerShell />
+              </HomeSidebarLayout>
             </section>
           }
         />

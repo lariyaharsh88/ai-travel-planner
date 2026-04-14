@@ -6,29 +6,29 @@ import { PDFDownloadLink } from "@react-pdf/renderer";
 import ItineraryPdfDocument from "@/components/ItineraryPdfDocument";
 import BlogSection from "@/components/planner/BlogSection";
 import BudgetSection from "@/components/planner/BudgetSection";
-import CreatorModeSection from "@/components/planner/CreatorModeSection";
-import { DestinationPhotosProvider } from "@/components/planner/DestinationPhotosContext";
+import CreatorStudioSection from "@/components/planner/CreatorStudioSection";
+import {
+  DestinationPhotosProvider,
+  useDestinationPhotosOptional,
+} from "@/components/planner/DestinationPhotosContext";
 import ItineraryDayCard from "@/components/planner/ItineraryDayCard";
-import InstagramSpotsSection from "@/components/planner/InstagramSpotsSection";
+import LockedItineraryDayCard from "@/components/planner/LockedItineraryDayCard";
 import MapSection from "@/components/planner/MapSection";
-import PhotoAnglesSection from "@/components/planner/PhotoAnglesSection";
+import PremiumConversionBanner from "@/components/planner/PremiumConversionBanner";
 import PremiumLockedSection from "@/components/planner/PremiumLockedSection";
-import ReelCarousel from "@/components/planner/ReelCarousel";
 import SectionHeader from "@/components/planner/SectionHeader";
 import TripPlanHero from "@/components/planner/TripPlanHero";
 import { EASE_APPLE_SOFT, sectionItemTransition } from "@/lib/motion-premium";
-import { type GenerationTier } from "@/lib/generation-tier";
+import { getPlaceImageUrl } from "@/lib/place-images";
 import { type PlanMode } from "@/lib/plan-mode";
-import { itineraryRouteForMap, type TravelPlanResponse } from "@/lib/travel-plan";
+import { itineraryRouteForMap, placesForMap, type TravelPlanResponse } from "@/lib/travel-plan";
 
 type PlanOutputProps = {
   result: TravelPlanResponse;
-  /** Trip destination from the form — powers imagery & copy */
   destination: string;
-  /** Mode used when this plan was generated */
   planMode: PlanMode;
-  /** Free tier masks premium content */
-  generationTier: GenerationTier;
+  /** Paid unlock or legacy credits — full UI */
+  hasPremiumAccess: boolean;
   onUpgrade: () => void;
 };
 
@@ -67,38 +67,103 @@ const dayCardItem = {
   },
 };
 
+function PremiumPdfDownloadLink({
+  result,
+  destination,
+}: {
+  result: TravelPlanResponse;
+  destination: string;
+}) {
+  const photos = useDestinationPhotosOptional();
+  const coverImageUrl =
+    photos?.heroPhoto?.src?.trim() || getPlaceImageUrl(destination, destination);
+
+  return (
+    <PDFDownloadLink
+      document={
+        <ItineraryPdfDocument
+          result={result}
+          destinationLabel={destination}
+          coverImageUrl={coverImageUrl}
+        />
+      }
+      fileName={`epic-india-${destination.replace(/\s+/g, "-").toLowerCase()}-itinerary.pdf`}
+      className="inline-flex items-center justify-center rounded-2xl border border-stone-200/90 bg-white px-6 py-3 text-sm font-medium text-stone-900 shadow-[0_8px_28px_-16px_rgba(15,23,42,0.1)] transition-[box-shadow,border-color] duration-500 hover:border-stone-300 hover:shadow-[0_16px_40px_-20px_rgba(15,23,42,0.12)]"
+    >
+      {({ loading }) => (loading ? "Preparing PDF…" : "Download PDF")}
+    </PDFDownloadLink>
+  );
+}
+
 export default function PlanOutput({
   result,
   destination,
   planMode,
-  generationTier,
+  hasPremiumAccess,
   onUpgrade,
 }: PlanOutputProps) {
   const mapRoute = useMemo(() => itineraryRouteForMap(result), [result]);
+  const itineraryPlaces = useMemo(() => placesForMap(result), [result]);
   const dest = destination.trim() || "India";
   const creatorFirst = planMode === "creator";
-  const isPremium = generationTier === "premium";
+  const isPremium = hasPremiumAccess;
+  const totalDays = result.dayWisePlan.length;
+  const showLimitedItinerary = !isPremium && totalDays > 1;
 
   const sectionBlocks: Record<string, ReactNode> = useMemo(
     () => ({
+      ...(planMode === "creator"
+        ? {
+            creator_studio: (
+              <motion.div key="creator_studio" variants={item} className="space-y-5">
+                <PremiumLockedSection
+                  locked={!isPremium}
+                  title="Creator Mode — shoot kit"
+                  subtitle="Reels, Instagram spots, camera angles & lighting notes for this exact route."
+                  onUnlock={onUpgrade}
+                >
+                  <CreatorStudioSection
+                    destination={dest}
+                    instagramSpots={result.instagramSpots}
+                    reelIdeas={result.reelIdeas}
+                    photoAngles={result.photoAngles}
+                  />
+                </PremiumLockedSection>
+              </motion.div>
+            ),
+          }
+        : {}),
       itinerary: (
         <motion.div key="itinerary" variants={item} className="space-y-5">
           <SectionHeader
             eyebrow="Itinerary"
             title="Day by day"
-            subtitle="Times, legs, and maps — built to use on the ground."
+            subtitle={
+              showLimitedItinerary
+                ? `Free preview · Day 1 only — unlock for all ${totalDays} days`
+                : "Times, legs, and maps — built to use on the ground."
+            }
           />
           <motion.div variants={dayCardStagger} initial="hidden" animate="visible" className="grid gap-6 md:gap-8">
-            {result.dayWisePlan.map((dayPlan, i) => (
-              <motion.div key={dayPlan.day} variants={dayCardItem}>
-                <ItineraryDayCard
-                  dayPlan={dayPlan}
-                  destination={dest}
-                  defaultOpen={i === 0}
-                  isPremiumOutput={isPremium}
-                />
-              </motion.div>
-            ))}
+            {result.dayWisePlan.map((dayPlan, i) => {
+              if (!isPremium && i > 0) {
+                return (
+                  <motion.div key={dayPlan.day} variants={dayCardItem}>
+                    <LockedItineraryDayCard dayPlan={dayPlan} onUnlock={onUpgrade} />
+                  </motion.div>
+                );
+              }
+              return (
+                <motion.div key={dayPlan.day} variants={dayCardItem}>
+                  <ItineraryDayCard
+                    dayPlan={dayPlan}
+                    destination={dest}
+                    defaultOpen={i === 0}
+                    isPremiumOutput={isPremium}
+                  />
+                </motion.div>
+              );
+            })}
           </motion.div>
         </motion.div>
       ),
@@ -109,7 +174,15 @@ export default function PlanOutput({
             title="Map & path"
             subtitle="Pins in order, road-aware path, open in Google Maps."
           />
-          <MapSection route={mapRoute} destination={dest} />
+          <PremiumLockedSection
+            locked={!isPremium}
+            title="Full route map & pins"
+            subtitle="See every stop in order with directions — unlock to interact without blur."
+            onUnlock={onUpgrade}
+            previewHeightClass="min-h-[260px] max-h-[min(36rem,78vh)]"
+          >
+            <MapSection route={mapRoute} destination={dest} />
+          </PremiumLockedSection>
         </motion.div>
       ),
       budget: (
@@ -122,41 +195,10 @@ export default function PlanOutput({
           <PremiumLockedSection
             locked={!isPremium}
             title="Full budget breakdown"
-            subtitle="See stay, food, and transport in one clear snapshot."
+            subtitle="Stay, food, and transport in INR — lines you can use when booking."
             onUnlock={onUpgrade}
           >
             <BudgetSection budget={result.budgetBreakdown} />
-          </PremiumLockedSection>
-        </motion.div>
-      ),
-      reels: (
-        <motion.div key="reels" variants={item} className="space-y-5">
-          <SectionHeader
-            eyebrow="Short video"
-            title="Reel scripts"
-            subtitle="Hooks, scripts, captions — copy when you need them."
-          />
-          <PremiumLockedSection
-            locked={!isPremium}
-            title="Reel scripts & captions"
-            onUnlock={onUpgrade}
-          >
-            <ReelCarousel ideas={result.reelIdeas} destination={dest} />
-          </PremiumLockedSection>
-        </motion.div>
-      ),
-      creator_bundle: (
-        <motion.div key="creator_bundle" variants={item} className="space-y-5">
-          <PremiumLockedSection
-            locked={!isPremium}
-            title="Creator mode — photo spots & angles"
-            onUnlock={onUpgrade}
-          >
-            <CreatorModeSection
-              destination={dest}
-              spotsBlock={<InstagramSpotsSection spots={result.instagramSpots} destination={dest} />}
-              anglesBlock={<PhotoAnglesSection angles={result.photoAngles} destination={dest} />}
-            />
           </PremiumLockedSection>
         </motion.div>
       ),
@@ -170,6 +212,7 @@ export default function PlanOutput({
           <PremiumLockedSection
             locked={!isPremium}
             title="SEO blog content"
+            subtitle="Headings and paragraphs you can publish or adapt."
             onUnlock={onUpgrade}
           >
             <BlogSection blog={result.blogContent} />
@@ -177,22 +220,29 @@ export default function PlanOutput({
         </motion.div>
       ),
     }),
-    [dest, isPremium, mapRoute, onUpgrade, result],
+    [dest, isPremium, mapRoute, onUpgrade, planMode, result, showLimitedItinerary, totalDays],
   );
 
-  const sectionOrder = creatorFirst
-    ? (["reels", "creator_bundle", "itinerary", "map", "budget", "blog"] as const)
-    : (["itinerary", "map", "budget", "reels", "creator_bundle", "blog"] as const);
+  const sectionOrder = useMemo(() => {
+    if (planMode !== "creator") {
+      return ["itinerary", "map", "budget", "blog"] as const;
+    }
+    return creatorFirst
+      ? (["creator_studio", "itinerary", "map", "budget", "blog"] as const)
+      : (["itinerary", "map", "budget", "creator_studio", "blog"] as const);
+  }, [planMode, creatorFirst]);
 
   return (
-    <DestinationPhotosProvider destination={dest}>
+    <DestinationPhotosProvider destination={dest} places={itineraryPlaces}>
       <motion.section
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.65, ease: EASE_APPLE_SOFT }}
-        className="w-full space-y-16 text-left md:space-y-24"
+        className="w-full space-y-24 text-left md:space-y-32"
       >
         <TripPlanHero destination={dest} planMode={planMode} />
+
+        {!isPremium ? <PremiumConversionBanner onUnlock={onUpgrade} /> : null}
 
         <div className="flex flex-col items-stretch justify-between gap-8 border-b border-stone-200/80 pb-12 sm:flex-row sm:items-end sm:pb-14">
           <motion.div
@@ -206,9 +256,13 @@ export default function PlanOutput({
                 <span className="ml-3 rounded-full bg-stone-100 px-2 py-0.5 text-[9px] font-medium tracking-[0.08em] text-stone-600">
                   Free preview
                 </span>
-              ) : null}
+              ) : (
+                <span className="ml-3 rounded-full bg-emerald-50 px-2 py-0.5 text-[9px] font-medium tracking-[0.08em] text-emerald-800 ring-1 ring-emerald-200/80">
+                  Premium
+                </span>
+              )}
             </p>
-            <h2 className="type-display mt-4 max-w-[20ch]">
+            <h2 className="type-display-lg mt-4 max-w-[22ch] text-balance">
               {creatorFirst ? `Shoot-ready plan for ${dest}` : `Trip plan for ${dest}`}
             </h2>
             <p className="type-body-muted mt-5 max-w-md">
@@ -223,13 +277,7 @@ export default function PlanOutput({
             className="inline-flex self-start sm:self-auto"
           >
             {isPremium ? (
-              <PDFDownloadLink
-                document={<ItineraryPdfDocument result={result} destinationLabel={dest} />}
-                fileName={`epic-india-${dest.replace(/\s+/g, "-").toLowerCase()}-itinerary.pdf`}
-                className="inline-flex items-center justify-center rounded-2xl border border-stone-200/90 bg-white px-6 py-3 text-sm font-medium text-stone-900 shadow-[0_8px_28px_-16px_rgba(15,23,42,0.1)] transition-[box-shadow,border-color] duration-500 hover:border-stone-300 hover:shadow-[0_16px_40px_-20px_rgba(15,23,42,0.12)]"
-              >
-                {({ loading }) => (loading ? "Preparing PDF…" : "Download PDF")}
-              </PDFDownloadLink>
+              <PremiumPdfDownloadLink result={result} destination={dest} />
             ) : (
               <button
                 type="button"
@@ -242,7 +290,7 @@ export default function PlanOutput({
           </motion.div>
         </div>
 
-        <motion.div variants={list} initial="hidden" animate="visible" className="space-y-16 md:space-y-24">
+        <motion.div variants={list} initial="hidden" animate="visible" className="space-y-20 md:space-y-28">
           {sectionOrder.map((key) => sectionBlocks[key])}
         </motion.div>
       </motion.section>

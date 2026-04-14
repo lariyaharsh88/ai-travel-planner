@@ -8,9 +8,11 @@ export type ScheduleStop = {
   place: string;
   /** Prefer exact amounts: "₹180" or "₹45/person"; tight ranges only when necessary */
   estimatedCost: string;
-  /** Practical: gate, queue, booking — must be specific to this place, not generic travel advice */
+  /**
+   * Crowd timing, best entry window, common scams/pitfalls to avoid — specific to this place (INR context).
+   */
   localTip?: string;
-  /** Hyper-specific: named dish, stall, timing, neighborhood detail (non-generic) */
+  /** Named dish, stall, price reality, neighborhood habit — insider detail */
   localInsight?: string;
   /** Full Google Maps URL (place or search link) */
   mapsLink: string;
@@ -34,6 +36,8 @@ export type TravelLeg = {
   legCost?: string;
   /** e.g. "Heavy traffic 6–8 PM" */
   note?: string;
+  /** Other realistic options: auto vs cab vs walk, with rough INR when relevant */
+  alternatives?: string;
 };
 
 export type DayPlan = {
@@ -80,11 +84,13 @@ export type InstagramSpot = {
 /** Photographer-style notes: where + how to frame */
 export type PhotoAngle = {
   spot: string;
+  /** e.g. "Wide", "Drone", "POV" — vary across the set */
+  shotType?: string;
   /** Camera height / lens feel / angle (e.g. low wide, 50mm portrait) */
   angle: string;
   /** Composition: rule of thirds, leading lines, foreground */
   composition: string;
-  /** Light quality / best time */
+  /** Light quality / best time (golden hour, sunset, blue hour) */
   lighting: string;
 };
 

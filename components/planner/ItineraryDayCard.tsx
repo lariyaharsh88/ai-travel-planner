@@ -39,11 +39,14 @@ export default function ItineraryDayCard({
         <PlaceImage
           place={dayCoverPlace}
           destination={dest}
-          aspectClassName="h-36 sm:h-44"
-          className="rounded-t-3xl"
+          aspectClassName="h-40 sm:h-48"
+          className="rounded-t-[1.75rem]"
           priority={defaultOpen}
+          variant="dayCover"
         />
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-stone-950/70 to-transparent" />
+        <div className="pointer-events-none absolute left-4 top-4 z-[2] rounded-full bg-black/25 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.2em] text-white shadow-sm backdrop-blur-md ring-1 ring-white/15">
+          Day {dayPlan.day}
+        </div>
       </div>
 
       <button
@@ -200,6 +203,12 @@ export default function ItineraryDayCard({
                           <p className="mt-1 text-[11px] leading-relaxed text-stone-700">
                             <span className="font-semibold text-stone-900">Route: </span>
                             {dayPlan.travelLegs[idx].route}
+                          </p>
+                        ) : null}
+                        {dayPlan.travelLegs[idx].alternatives ? (
+                          <p className="mt-1 text-[11px] leading-relaxed text-stone-600">
+                            <span className="font-semibold text-stone-800">Also: </span>
+                            {dayPlan.travelLegs[idx].alternatives}
                           </p>
                         ) : null}
                         {dayPlan.travelLegs[idx].note ? (

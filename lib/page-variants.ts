@@ -7,30 +7,30 @@ export const homeGridContainer: Variants = {
   visible: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.07,
-      delayChildren: 0.06,
+      staggerChildren: 0.095,
+      delayChildren: 0.12,
       when: "beforeChildren",
     },
   },
 };
 
 export const homeColumnLeft: Variants = {
-  hidden: { opacity: 0, x: -12, y: 6 },
+  hidden: { opacity: 0, x: -8, y: 8 },
   visible: {
     opacity: 1,
     x: 0,
     y: 0,
-    transition: { duration: 0.75, ease: EASE_APPLE_SOFT },
+    transition: { duration: 0.82, ease: EASE_APPLE_SOFT },
   },
 };
 
 export const homeColumnRight: Variants = {
-  hidden: { opacity: 0, x: 12, y: 6 },
+  hidden: { opacity: 0, x: 8, y: 8 },
   visible: {
     opacity: 1,
     x: 0,
     y: 0,
-    transition: { duration: 0.75, ease: EASE_APPLE_SOFT },
+    transition: { duration: 0.82, ease: EASE_APPLE_SOFT },
   },
 };
 

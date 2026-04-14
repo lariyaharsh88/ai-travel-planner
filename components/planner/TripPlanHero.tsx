@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { useDestinationPhotosOptional } from "@/components/planner/DestinationPhotosContext";
+import ImageCardSkeleton from "@/components/planner/ImageCardSkeleton";
 import { getPlaceImageUrl } from "@/lib/place-images";
 import { EASE_APPLE_SOFT } from "@/lib/motion-premium";
 import { type PlanMode } from "@/lib/plan-mode";
@@ -12,13 +13,15 @@ type TripPlanHeroProps = {
   planMode?: PlanMode;
 };
 
-export default function TripPlanHero({ destination, planMode = "creator" }: TripPlanHeroProps) {
+export default function TripPlanHero({ destination, planMode = "standard" }: TripPlanHeroProps) {
   const place = destination.trim() || "India";
   const photosCtx = useDestinationPhotosOptional();
   const hero = photosCtx?.heroPhoto;
+  const destLoading = photosCtx?.destinationLoading ?? false;
   const src = hero?.src ?? getPlaceImageUrl(place, place);
   const alt = hero?.alt?.trim() ? hero.alt : `${place} — trip hero`;
   const isCreator = planMode === "creator";
+  const showHeroSkeleton = destLoading;
 
   return (
     <motion.div
@@ -28,18 +31,23 @@ export default function TripPlanHero({ destination, planMode = "creator" }: Trip
       className="relative overflow-hidden rounded-[1.75rem] ring-1 ring-black/[0.05]"
     >
       <div className="relative aspect-[21/9] min-h-[180px] w-full sm:min-h-[220px] lg:aspect-[24/9]">
-        <Image
-          src={src}
-          alt={alt}
-          fill
-          priority
-          sizes="(max-width: 1024px) 100vw, min(1152px, 100vw)"
-          className="object-cover object-center"
-        />
+        {showHeroSkeleton ? (
+          <ImageCardSkeleton className="absolute inset-0 h-full min-h-[180px] sm:min-h-[220px]" />
+        ) : (
+          <Image
+            src={src}
+            alt={alt}
+            fill
+            priority
+            sizes="(max-width: 1024px) 100vw, min(1152px, 100vw)"
+            className="object-cover object-center transition duration-[1.2s] ease-[cubic-bezier(0.16,1,0.3,1)]"
+          />
+        )}
         <div
-          className="absolute inset-0 bg-gradient-to-t from-stone-950 via-stone-950/35 to-stone-900/25"
+          className="absolute inset-0 bg-gradient-to-t from-stone-950 via-stone-950/40 to-stone-900/20"
           aria-hidden
         />
+        <div className="absolute inset-0 bg-gradient-to-r from-stone-950/30 via-transparent to-stone-950/20" aria-hidden />
         <div className="absolute inset-0 flex flex-col justify-end p-8 sm:p-10 lg:p-12">
           <p className="type-eyebrow text-amber-200/90">{isCreator ? "Creator dossier" : "Your trip"}</p>
           <h2 className="mt-4 max-w-2xl text-3xl font-light tracking-tight text-white text-balance sm:text-4xl">
@@ -50,7 +58,7 @@ export default function TripPlanHero({ destination, planMode = "creator" }: Trip
               ? "Spots and scripts below — then your full route and map."
               : "Itinerary and map below — creator content when you need it."}
           </p>
-          {hero ? (
+          {hero && !showHeroSkeleton ? (
             <a
               href={hero.creditUrl}
               target="_blank"

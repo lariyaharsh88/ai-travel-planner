@@ -2,16 +2,23 @@
 
 :root {
   /* Calm editorial — minimal luxury */
-  --background: #f6f5f2;
+  --background: #f5f4f0;
   --foreground: #14120f;
-  --surface-page: #f6f5f2;
+  --surface-page: #f5f4f0;
   --surface-elevated: #ffffff;
   --border-subtle: rgba(15, 23, 42, 0.06);
   --brand-accent: #c2410c;
   --brand-accent-soft: rgba(194, 65, 12, 0.1);
   --brand-mist: rgba(255, 255, 255, 0.82);
-  --space-section: clamp(3.5rem, 8vw, 6rem);
+  --space-section: clamp(4rem, 9vw, 7rem);
   --space-block: clamp(1.75rem, 4vw, 2.75rem);
+  /** iOS home indicator + fixed chrome */
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --shadow-card: 0 1px 0 rgba(15, 23, 42, 0.04), 0 20px 48px -28px rgba(15, 23, 42, 0.09);
+  --shadow-card-hover: 0 28px 64px -32px rgba(15, 23, 42, 0.12);
+  --glass-bg: rgba(255, 255, 255, 0.68);
+  --glass-border: rgba(255, 255, 255, 0.55);
 }
 
 @theme inline {
@@ -109,30 +116,66 @@ body {
 
   /** Minimal type scale — use for section chrome */
   .type-eyebrow {
-    font-size: 0.625rem;
-    font-weight: 500;
-    letter-spacing: 0.22em;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.2em;
     text-transform: uppercase;
     color: rgb(120 113 108);
   }
 
   .type-display {
-    font-size: clamp(1.5rem, 2.5vw, 2rem);
+    font-size: clamp(1.5rem, 2.4vw, 1.95rem);
     font-weight: 300;
-    letter-spacing: -0.03em;
-    line-height: 1.2;
+    letter-spacing: -0.035em;
+    line-height: 1.18;
+    color: rgb(28 25 23);
+  }
+
+  /** Slightly larger — primary page titles only */
+  .type-display-lg {
+    font-size: clamp(1.625rem, 2.65vw, 2.125rem);
+    font-weight: 300;
+    letter-spacing: -0.038em;
+    line-height: 1.14;
     color: rgb(28 25 23);
   }
 
   .type-body-muted {
     font-size: 0.9375rem;
-    line-height: 1.65;
+    line-height: 1.68;
     color: rgb(87 83 78);
   }
 
   .section-y {
     padding-top: var(--space-section);
     padding-bottom: var(--space-section);
+  }
+
+  /** Subtle separation between major blocks */
+  .section-rule {
+    height: 1px;
+    width: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(15, 23, 42, 0.08) 15%,
+      rgba(15, 23, 42, 0.08) 85%,
+      transparent
+    );
+  }
+
+  /** Glass panels — nav, floating chrome */
+  .glass-nav {
+    background: var(--glass-bg);
+    border-color: var(--glass-border);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+  }
+
+  @supports (backdrop-filter: blur(20px)) {
+    .glass-nav {
+      background: rgba(255, 255, 255, 0.58);
+    }
   }
 
   .surface-hero {

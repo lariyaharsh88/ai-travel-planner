@@ -7,6 +7,7 @@ import BudgetDaysControls from "@/components/BudgetDaysControls";
 import DestinationCombobox from "@/components/DestinationCombobox";
 import PremiumInteractiveForm from "@/components/ui/PremiumInteractiveForm";
 import { EASE_APPLE, EASE_APPLE_SOFT, springGentle } from "@/lib/motion-premium";
+import PlanModeToggle from "@/components/planner/PlanModeToggle";
 import { type PlanMode } from "@/lib/plan-mode";
 import { TRAVEL_STYLES, type TravelStyleValue } from "@/lib/travel-styles";
 
@@ -70,9 +71,9 @@ export default function InputForm({
       <div className="mb-10 flex flex-wrap items-end justify-between gap-6">
         <div className="min-w-0 flex-1">
           <p className="type-eyebrow text-[#c2410c]/90">Plan</p>
-          <h3 className="type-display mt-3 text-[1.375rem] sm:text-[1.5rem]">Your trip, one brief</h3>
+          <h3 className="type-display-lg mt-3 text-balance">Your trip, one brief</h3>
           <p className="type-body-muted mt-4 max-w-md">
-            Route, timing, and creator outputs — minimal inputs, maximum clarity.
+            Creator Mode adds reels, IG spots, and camera angles — or stay on Normal for a trip-first plan.
           </p>
         </div>
         <motion.span
@@ -87,43 +88,11 @@ export default function InputForm({
       </div>
 
       <div className="mb-10">
-        <p id="plan-mode-label" className="type-eyebrow mb-4">
-          Plan type
-        </p>
-        <div
-          className="grid grid-cols-1 gap-2 sm:grid-cols-2"
-          role="radiogroup"
-          aria-labelledby="plan-mode-label"
-        >
-          {(
-            [
-              { value: "standard" as const, title: "Trip-first", desc: "Route, map, and budget." },
-              { value: "creator" as const, title: "Creator", desc: "Spots, reels, angles, and light." },
-            ] as const
-          ).map(({ value, title, desc }) => {
-            const active = formData.planMode === value;
-            return (
-              <motion.button
-                key={value}
-                type="button"
-                role="radio"
-                aria-checked={active}
-                onClick={() => setFormData((prev) => ({ ...prev, planMode: value }))}
-                whileHover={{ y: -1, transition: { duration: 0.45, ease: EASE_APPLE_SOFT } }}
-                whileTap={{ scale: 0.99 }}
-                transition={springGentle}
-                className={`rounded-2xl border px-4 py-4 text-left transition-shadow duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stone-400/40 ${
-                  active
-                    ? "border-stone-900/15 bg-stone-50 text-stone-900 shadow-[0_12px_40px_-28px_rgba(15,23,42,0.12)]"
-                    : "border-stone-200/80 bg-white text-stone-800 hover:border-stone-300/90"
-                }`}
-              >
-                <span className="block text-sm font-medium tracking-tight">{title}</span>
-                <span className="mt-1.5 block text-[13px] font-normal leading-snug text-stone-500">{desc}</span>
-              </motion.button>
-            );
-          })}
-        </div>
+        <PlanModeToggle
+          value={formData.planMode}
+          disabled={isLoading}
+          onChange={(planMode) => setFormData((prev) => ({ ...prev, planMode }))}
+        />
       </div>
 
       <div className="space-y-8 sm:space-y-12">
@@ -175,7 +144,7 @@ export default function InputForm({
                   whileHover={{ y: -1, transition: { duration: 0.45, ease: EASE_APPLE_SOFT } }}
                   whileTap={{ scale: 0.99 }}
                   transition={springGentle}
-                  className={`rounded-full border px-4 py-2.5 text-left text-sm font-medium transition-colors duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stone-400/40 ${
+                  className={`min-h-[44px] rounded-full border px-4 py-2.5 text-left text-sm font-medium transition-colors duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stone-400/40 ${
                     active
                       ? "border-stone-800/20 bg-stone-900 text-white"
                       : "border-stone-200/90 bg-white text-stone-700 hover:border-stone-300"
@@ -211,7 +180,7 @@ export default function InputForm({
                   whileHover={{ y: -1 }}
                   whileTap={{ scale: 0.98 }}
                   transition={springGentle}
-                  className={`rounded-full border px-3.5 py-2 text-xs font-medium capitalize transition-colors duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stone-400/40 ${
+                  className={`min-h-[40px] rounded-full border px-3.5 py-2.5 text-xs font-medium capitalize transition-colors duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stone-400/40 sm:min-h-0 sm:py-2 ${
                     checked
                       ? "border-stone-800 bg-stone-900 text-white"
                       : "border-stone-200/90 bg-white text-stone-600 hover:border-stone-300"
@@ -241,21 +210,35 @@ export default function InputForm({
         type="submit"
         disabled={isLoading}
         aria-busy={isLoading}
-        whileHover={isLoading ? undefined : { scale: 1.01, transition: { duration: 0.5, ease: EASE_APPLE_SOFT } }}
-        whileTap={isLoading ? undefined : { scale: 0.995 }}
+        whileHover={
+          isLoading
+            ? undefined
+            : { scale: 1.015, y: -1, transition: { duration: 0.45, ease: EASE_APPLE_SOFT } }
+        }
+        whileTap={isLoading ? undefined : { scale: 0.988 }}
         transition={springGentle}
-        className="mt-6 flex w-full items-center justify-center gap-2 rounded-2xl bg-[#14120f] px-5 py-4 text-sm font-medium text-white shadow-[0_12px_40px_-16px_rgba(15,23,42,0.35)] transition-[box-shadow,transform] duration-500 hover:shadow-[0_20px_48px_-20px_rgba(15,23,42,0.28)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stone-400 disabled:cursor-not-allowed disabled:opacity-55 sm:text-[0.9375rem]"
+        className="group relative mt-8 flex w-full items-center justify-center gap-2 overflow-hidden rounded-[1.125rem] bg-[#14120f] px-5 py-4 text-sm font-semibold text-white shadow-[0_14px_44px_-18px_rgba(15,23,42,0.4)] ring-1 ring-white/10 transition-[box-shadow] duration-500 hover:shadow-[0_22px_56px_-22px_rgba(15,23,42,0.38)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stone-400 disabled:cursor-not-allowed disabled:opacity-55 sm:mt-10 sm:py-[1.125rem] sm:text-[0.9375rem]"
       >
-        {isLoading ? (
-          <>
-            <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/25 border-t-white" />
-            {formData.destination.trim()
-              ? `Planning your ${formData.destination.trim()} trip…`
-              : "Planning your trip…"}
-          </>
-        ) : (
-          "Generate my plan"
-        )}
+        <span
+          className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+          aria-hidden
+          style={{
+            background:
+              "linear-gradient(105deg, transparent 0%, rgba(255,255,255,0.09) 45%, transparent 70%)",
+          }}
+        />
+        <span className="relative z-[1] flex items-center gap-2">
+          {isLoading ? (
+            <>
+              <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/25 border-t-white" />
+              {formData.destination.trim()
+                ? `Planning your ${formData.destination.trim()} trip…`
+                : "Planning your trip…"}
+            </>
+          ) : (
+            "Generate my plan"
+          )}
+        </span>
       </motion.button>
     </PremiumInteractiveForm>
   );

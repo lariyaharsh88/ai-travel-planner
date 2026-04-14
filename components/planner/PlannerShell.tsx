@@ -1,23 +1,23 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { FormEvent, useCallback, useState } from "react";
-import { EASE_APPLE } from "@/lib/motion-premium";
+import { FormEvent, useCallback, useMemo, useState } from "react";
+import { enterSoftTransition } from "@/lib/motion-premium";
 import { toast } from "sonner";
 import FloatingCta from "@/components/planner/FloatingCta";
 import InputForm, { type InputFormData } from "@/components/planner/InputForm";
 import LoadingState from "@/components/planner/LoadingState";
 import PaywallModal from "@/components/planner/PaywallModal";
 import PlanOutput from "@/components/planner/PlanOutput";
-import { type GenerationTier } from "@/lib/generation-tier";
+import {
+  canGenerate,
+  getUsageState,
+  hasPremiumAccess,
+  saveUsageState,
+  type UsageState,
+} from "@/lib/usage-storage";
 import { DEFAULT_PLAN_MODE, type PlanMode } from "@/lib/plan-mode";
 import { TravelPlanResponse } from "@/lib/travel-plan";
-
-type UsageState = {
-  date: string;
-  freeUsed: number;
-  paidCredits: number;
-};
 
 type RazorpayResponse = {
   razorpay_payment_id: string;
@@ -30,9 +30,8 @@ type RazorpayOptions = {
   name: string;
   description: string;
   handler: (response: RazorpayResponse) => void;
-  theme?: {
-    color?: string;
-  };
+  theme?: { color?: string };
+  modal?: { ondismiss?: () => void };
 };
 
 type RazorpayInstance = {
@@ -45,51 +44,15 @@ declare global {
   }
 }
 
-const USAGE_STORAGE_KEY = "ai-travel-planner-usage";
-const DAILY_FREE_LIMIT = 1;
-
-function getTodayKey() {
-  return new Date().toISOString().slice(0, 10);
-}
-
-function getUsageState(): UsageState {
-  if (typeof window === "undefined") {
-    return { date: getTodayKey(), freeUsed: 0, paidCredits: 0 };
-  }
-
-  try {
-    const raw = window.localStorage.getItem(USAGE_STORAGE_KEY);
-    if (!raw) return { date: getTodayKey(), freeUsed: 0, paidCredits: 0 };
-
-    const parsed = JSON.parse(raw) as Partial<UsageState>;
-    const today = getTodayKey();
-    if (parsed.date !== today) {
-      const resetState = {
-        date: today,
-        freeUsed: 0,
-        paidCredits: parsed.paidCredits ?? 0,
-      };
-      window.localStorage.setItem(USAGE_STORAGE_KEY, JSON.stringify(resetState));
-      return resetState;
+function bumpUsageState(prev: UsageState, usesPremiumGeneration: boolean): UsageState {
+  if (prev.premiumUnlocked) return prev;
+  if (usesPremiumGeneration) {
+    if ((prev.paidCredits ?? 0) > 0) {
+      return { ...prev, paidCredits: Math.max(0, prev.paidCredits - 1) };
     }
-
-    return {
-      date: parsed.date ?? today,
-      freeUsed: parsed.freeUsed ?? 0,
-      paidCredits: parsed.paidCredits ?? 0,
-    };
-  } catch {
-    return { date: getTodayKey(), freeUsed: 0, paidCredits: 0 };
+    return prev;
   }
-}
-
-function saveUsageState(nextState: UsageState) {
-  if (typeof window === "undefined") return;
-  window.localStorage.setItem(USAGE_STORAGE_KEY, JSON.stringify(nextState));
-}
-
-function canGenerate(state: UsageState) {
-  return state.freeUsed < DAILY_FREE_LIMIT || state.paidCredits > 0;
+  return { ...prev, freeUsed: prev.freeUsed + 1 };
 }
 
 export default function PlannerShell() {
@@ -105,9 +68,12 @@ export default function PlannerShell() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [generatedPlan, setGeneratedPlan] = useState<TravelPlanResponse | null>(null);
-  const [generationTier, setGenerationTier] = useState<GenerationTier>("premium");
+  const [usageRev, setUsageRev] = useState(0);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [isPaying, setIsPaying] = useState(false);
+
+  const usage = useMemo(() => getUsageState(), [usageRev]);
+  const userHasPremium = hasPremiumAccess(usage);
 
   const razorpayKey = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID;
 
@@ -115,13 +81,16 @@ export default function PlannerShell() {
     document.getElementById("planner-form")?.scrollIntoView({ behavior: "smooth", block: "start" });
   }, []);
 
+  const refreshUsage = useCallback(() => setUsageRev((n) => n + 1), []);
+
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const usageState = getUsageState();
     if (!canGenerate(usageState)) {
       setShowUpgradeModal(true);
       toast.message("Unlock Premium Travel Plan", {
-        description: "Hidden gems, creator spots, PDF & budget breakdown — when you’re ready to go beyond the free daily plan.",
+        description:
+          "You’ve used today’s free preview. ₹99 unlocks the full itinerary, hidden gems, creator kit, budget & PDF.",
       });
       return;
     }
@@ -151,15 +120,13 @@ export default function PlannerShell() {
       }
 
       const before = getUsageState();
-      const tier: GenerationTier = before.freeUsed < DAILY_FREE_LIMIT ? "free" : "premium";
-      const nextUsageState =
-        before.freeUsed < DAILY_FREE_LIMIT
-          ? { ...before, freeUsed: before.freeUsed + 1 }
-          : { ...before, paidCredits: Math.max(before.paidCredits - 1, 0) };
-      saveUsageState(nextUsageState);
+      const usesPremiumGeneration =
+        before.premiumUnlocked === true || (before.paidCredits ?? 0) > 0;
+      const next = bumpUsageState(before, usesPremiumGeneration);
+      saveUsageState(next);
+      refreshUsage();
 
       setLastPlanMode(formData.planMode);
-      setGenerationTier(tier);
       setGeneratedPlan(data);
       toast.success("Your trip is ready", {
         description: "Scroll to explore your itinerary and map.",
@@ -212,18 +179,21 @@ export default function PlannerShell() {
       key: razorpayKey,
       amount: 9900,
       currency: "INR",
-      name: "Unlock Premium Travel Plan",
-      description: "Hidden gems · Creator spots · PDF · Budget breakdown",
+      name: "EpicIndiaTrips AI Planner",
+      description: "Premium Travel Plan — full itinerary, gems, creator, budget & PDF",
       handler: () => {
-        const currentUsage = getUsageState();
-        const nextUsage = { ...currentUsage, paidCredits: currentUsage.paidCredits + 1 };
-        saveUsageState(nextUsage);
+        const current = getUsageState();
+        saveUsageState({ ...current, premiumUnlocked: true, paidCredits: 0 });
+        refreshUsage();
         setShowUpgradeModal(false);
         setError(null);
         setIsPaying(false);
-        toast.success("Unlock Premium Travel Plan", {
-          description: "You’re in — hidden gems, creator spots, PDF & budget breakdown on your next generations.",
+        toast.success("Premium unlocked", {
+          description: "Full itinerary, hidden gems, creator kit, budget & PDF — scroll to explore.",
         });
+      },
+      modal: {
+        ondismiss: () => setIsPaying(false),
       },
       theme: {
         color: "#FF6B35",
@@ -232,11 +202,12 @@ export default function PlannerShell() {
 
     const paymentObject = new window.Razorpay(options);
     paymentObject.open();
-    setIsPaying(false);
   };
 
+  const showFloatingUpgrade = Boolean(generatedPlan && !userHasPremium);
+
   return (
-    <div className="space-y-8 pb-28 sm:space-y-10 sm:pb-12">
+    <div className="space-y-10 pb-[calc(7rem+env(safe-area-inset-bottom,0px))] sm:space-y-12 sm:pb-16">
       <InputForm
         formData={formData}
         setFormData={setFormData}
@@ -259,21 +230,25 @@ export default function PlannerShell() {
             initial={{ opacity: 0, y: 28 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -12 }}
-            transition={{ duration: 0.5, ease: EASE_APPLE }}
+            transition={enterSoftTransition}
             className="pt-2"
           >
             <PlanOutput
               result={generatedPlan}
               destination={formData.destination}
               planMode={lastPlanMode}
-              generationTier={generationTier}
+              hasPremiumAccess={userHasPremium}
               onUpgrade={() => setShowUpgradeModal(true)}
             />
           </motion.div>
         ) : null}
       </AnimatePresence>
 
-      <FloatingCta onClick={scrollToForm} />
+      <FloatingCta
+        onClick={scrollToForm}
+        onUnlock={() => setShowUpgradeModal(true)}
+        showUpgrade={showFloatingUpgrade}
+      />
 
       <PaywallModal
         open={showUpgradeModal}

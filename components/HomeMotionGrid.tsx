@@ -18,7 +18,7 @@ export default function HomeMotionGrid({ hero, sidebar }: HomeMotionGridProps) {
 
   if (reduce) {
     return (
-      <div className="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:items-stretch lg:gap-14">
+      <div className="grid grid-cols-1 gap-14 lg:grid-cols-12 lg:items-stretch lg:gap-16">
         <div className="flex min-h-0 flex-col self-stretch lg:col-span-5">{hero}</div>
         <div className="min-h-0 lg:col-span-7">{sidebar}</div>
       </div>
@@ -27,7 +27,7 @@ export default function HomeMotionGrid({ hero, sidebar }: HomeMotionGridProps) {
 
   return (
     <motion.div
-      className="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:items-stretch lg:gap-14"
+      className="grid grid-cols-1 gap-14 lg:grid-cols-12 lg:items-stretch lg:gap-16"
       variants={homeGridContainer}
       initial="hidden"
       animate="visible"

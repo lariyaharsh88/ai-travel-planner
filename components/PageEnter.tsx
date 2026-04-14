@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { type ReactNode } from "react";
 import { EASE_APPLE_SOFT } from "@/lib/motion-premium";
 
@@ -9,13 +9,15 @@ type PageEnterProps = {
   className?: string;
 };
 
-/** Fade + slide entry */
+/** Fade + slide entry — respects reduced motion */
 export default function PageEnter({ children, className = "" }: PageEnterProps) {
+  const reduce = useReducedMotion();
+
   return (
     <motion.div
-      initial={{ opacity: 0, y: 12 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.72, ease: EASE_APPLE_SOFT }}
+      initial={reduce ? false : { opacity: 0, y: 12 }}
+      animate={reduce ? undefined : { opacity: 1, y: 0 }}
+      transition={{ duration: 0.82, ease: EASE_APPLE_SOFT }}
       className={className}
     >
       {children}

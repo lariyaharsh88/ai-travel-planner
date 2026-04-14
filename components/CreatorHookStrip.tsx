@@ -1,8 +1,8 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { Camera, Clapperboard, PenLine } from "lucide-react";
-import { EASE_APPLE_SOFT } from "@/lib/motion-premium";
+import { EASE_APPLE_SOFT, fadeInItem, staggerFast } from "@/lib/motion-premium";
 
 const items = [
   { label: "Reels & scripts", icon: Clapperboard },
@@ -11,40 +11,69 @@ const items = [
 ] as const;
 
 export default function CreatorHookStrip() {
+  const reduce = useReducedMotion();
+
   return (
     <motion.div
       id="creator-toolkit"
-      initial={{ opacity: 0, y: 14 }}
+      initial={{ opacity: 0, y: 16 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-40px" }}
-      transition={{ duration: 0.7, ease: EASE_APPLE_SOFT }}
-      className="relative overflow-hidden rounded-[1.75rem] border border-stone-800/90 bg-[#14120f] p-8 shadow-[0_24px_64px_-32px_rgba(0,0,0,0.5)] sm:p-9"
+      transition={{ duration: 0.72, ease: EASE_APPLE_SOFT }}
+      className="relative overflow-hidden rounded-[1.75rem] border border-white/[0.06] bg-[#14120f] p-8 shadow-[0_28px_72px_-36px_rgba(0,0,0,0.55)] ring-1 ring-white/[0.04] sm:p-9"
     >
       <div
-        className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-[#c2410c]/20 blur-3xl"
+        className="pointer-events-none absolute -right-16 -top-16 h-52 w-52 rounded-full bg-[#c2410c]/18 blur-3xl"
+        aria-hidden
+      />
+      <div
+        className="pointer-events-none absolute inset-0 bg-gradient-to-br from-white/[0.03] via-transparent to-transparent"
         aria-hidden
       />
 
       <div className="relative">
         <p className="type-eyebrow text-stone-500">For creators</p>
-        <h2 className="type-display mt-4 text-[1.25rem] text-white sm:text-[1.375rem]">
+        <h2 className="type-display mt-5 text-[1.25rem] text-white sm:text-[1.375rem]">
           Trip plan + content kit
         </h2>
         <p className="mt-4 max-w-lg text-[0.9375rem] leading-relaxed text-stone-400">
           Same run delivers routes and shoot-ready notes — not a generic wall of text.
         </p>
 
-        <ul className="mt-8 flex flex-wrap gap-2.5" aria-label="Creator deliverables">
-          {items.map(({ label, icon: Icon }) => (
-            <li
-              key={label}
-              className="inline-flex items-center gap-2 rounded-full border border-white/[0.08] bg-white/[0.04] px-3.5 py-2 text-[12px] font-medium text-white/90"
-            >
-              <Icon className="h-3.5 w-3.5 shrink-0 text-stone-500" strokeWidth={1.75} aria-hidden />
-              {label}
-            </li>
-          ))}
-        </ul>
+        {reduce ? (
+          <ul className="mt-8 flex flex-wrap gap-2.5" aria-label="Creator deliverables">
+            {items.map(({ label, icon: Icon }) => (
+              <li
+                key={label}
+                className="inline-flex items-center gap-2 rounded-full border border-white/[0.08] bg-white/[0.04] px-3.5 py-2 text-[12px] font-medium text-white/90 backdrop-blur-sm"
+              >
+                <Icon className="h-3.5 w-3.5 shrink-0 text-stone-500" strokeWidth={1.75} aria-hidden />
+                {label}
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <motion.ul
+            className="mt-8 flex flex-wrap gap-2.5"
+            aria-label="Creator deliverables"
+            variants={staggerFast}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-20px" }}
+          >
+            {items.map(({ label, icon: Icon }) => (
+              <motion.li
+                key={label}
+                variants={fadeInItem}
+                whileHover={{ y: -2, transition: { duration: 0.35, ease: EASE_APPLE_SOFT } }}
+                className="inline-flex cursor-default items-center gap-2 rounded-full border border-white/[0.08] bg-white/[0.04] px-3.5 py-2 text-[12px] font-medium text-white/90 backdrop-blur-sm transition-shadow duration-300 hover:border-white/[0.12] hover:shadow-[0_8px_24px_-12px_rgba(0,0,0,0.4)]"
+              >
+                <Icon className="h-3.5 w-3.5 shrink-0 text-stone-500" strokeWidth={1.75} aria-hidden />
+                {label}
+              </motion.li>
+            ))}
+          </motion.ul>
+        )}
       </div>
     </motion.div>
   );

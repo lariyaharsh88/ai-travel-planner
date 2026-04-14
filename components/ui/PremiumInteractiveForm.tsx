@@ -12,7 +12,7 @@ const baseForm =
 export default function PremiumInteractiveForm({
   children,
   className = "",
-  hoverLift = 2,
+  hoverLift = 3,
   ...rest
 }: Omit<HTMLMotionProps<"form">, "children"> & {
   children: ReactNode;
@@ -25,7 +25,7 @@ export default function PremiumInteractiveForm({
       whileHover={whileHover}
       whileTap={whileTap}
       transition={{ duration: 0.65, ease: EASE_APPLE_SOFT }}
-      className={`group ${baseForm} shadow-[0_1px_0_rgba(15,23,42,0.04),0_18px_48px_-28px_rgba(15,23,42,0.09)] transition-[box-shadow,border-color] duration-[650ms] [transition-timing-function:cubic-bezier(0.16,1,0.32,1)] hover:border-black/[0.07] hover:shadow-[0_24px_56px_-32px_rgba(15,23,42,0.1)] ${className}`}
+      className={`group ${baseForm} shadow-[var(--shadow-card)] transition-[box-shadow,border-color] duration-[650ms] [transition-timing-function:cubic-bezier(0.16,1,0.32,1)] hover:border-black/[0.08] hover:shadow-[var(--shadow-card-hover)] ${className}`}
       {...rest}
     >
       <div

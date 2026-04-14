@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import "leaflet/dist/leaflet.css";
@@ -15,6 +15,12 @@ export const metadata: Metadata = {
   title: "EpicIndiaTrips AI Planner — Premium India trip & creator kit",
   description:
     "Plan India trips with AI — practical itineraries, maps & routes, budgets, reel scripts, Instagram spots, photo angles & SEO blog drafts. Built for travelers and creators.",
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
 };
 
 export default function RootLayout({
