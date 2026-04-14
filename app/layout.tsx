@@ -2,19 +2,19 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import "leaflet/dist/leaflet.css";
-import Navbar from "@/components/Navbar";
+import PremiumNavbar from "@/components/PremiumNavbar";
 import Providers from "@/components/Providers";
 
-const inter = Inter({
-  variable: "--font-inter",
+const fontSans = Inter({
   subsets: ["latin"],
   display: "swap",
+  variable: "--font-inter",
 });
 
 export const metadata: Metadata = {
-  title: "EpicIndiaTrips AI Planner — Plan India with AI",
+  title: "EpicIndiaTrips AI Planner — Premium India trip & creator kit",
   description:
-    "Hidden gems, reels, and full itineraries in seconds. Day-wise plans, maps, budgets, and content ideas.",
+    "Plan India trips with AI — practical itineraries, maps & routes, budgets, reel scripts, Instagram spots, photo angles & SEO blog drafts. Built for travelers and creators.",
 };
 
 export default function RootLayout({
@@ -23,13 +23,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} h-full scroll-smooth antialiased`}>
-      <body className="min-h-full flex flex-col bg-[#faf8f4] text-stone-900">
+    <html lang="en" className={`${fontSans.variable} ${fontSans.className} h-full scroll-smooth`}>
+      <body className="min-h-full flex flex-col bg-[var(--surface-page)] text-[var(--foreground)] antialiased">
         <Providers>
           <a href="#planner-form" className="skip-link">
             Skip to trip form
           </a>
-          <Navbar />
+          <PremiumNavbar />
           {children}
         </Providers>
       </body>

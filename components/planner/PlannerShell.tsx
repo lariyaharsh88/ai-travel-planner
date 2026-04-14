@@ -1,14 +1,16 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { Check } from "lucide-react";
 import { FormEvent, useCallback, useState } from "react";
 import { EASE_APPLE } from "@/lib/motion-premium";
 import { toast } from "sonner";
 import FloatingCta from "@/components/planner/FloatingCta";
 import InputForm, { type InputFormData } from "@/components/planner/InputForm";
 import LoadingState from "@/components/planner/LoadingState";
+import PaywallModal from "@/components/planner/PaywallModal";
 import PlanOutput from "@/components/planner/PlanOutput";
+import { type GenerationTier } from "@/lib/generation-tier";
+import { DEFAULT_PLAN_MODE, type PlanMode } from "@/lib/plan-mode";
 import { TravelPlanResponse } from "@/lib/travel-plan";
 
 type UsageState = {
@@ -97,10 +99,13 @@ export default function PlannerShell() {
     days: 1,
     travelStyle: "budget",
     interests: [],
+    planMode: DEFAULT_PLAN_MODE,
   });
+  const [lastPlanMode, setLastPlanMode] = useState<PlanMode>(DEFAULT_PLAN_MODE);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [generatedPlan, setGeneratedPlan] = useState<TravelPlanResponse | null>(null);
+  const [generationTier, setGenerationTier] = useState<GenerationTier>("premium");
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [isPaying, setIsPaying] = useState(false);
 
@@ -115,8 +120,8 @@ export default function PlannerShell() {
     const usageState = getUsageState();
     if (!canGenerate(usageState)) {
       setShowUpgradeModal(true);
-      toast.message("Daily free limit reached", {
-        description: "Unlock Premium Travel Plan for PDF, hidden gems, reel scripts & budget breakdown.",
+      toast.message("Unlock Premium Travel Plan", {
+        description: "Hidden gems, creator spots, PDF & budget breakdown — when you’re ready to go beyond the free daily plan.",
       });
       return;
     }
@@ -136,6 +141,7 @@ export default function PlannerShell() {
           days: formData.days,
           style: formData.travelStyle,
           interests: formData.interests,
+          planMode: formData.planMode,
         }),
       });
 
@@ -144,13 +150,16 @@ export default function PlannerShell() {
         throw new Error(data.error ?? "Failed to generate plan");
       }
 
-      const refreshedUsageState = getUsageState();
+      const before = getUsageState();
+      const tier: GenerationTier = before.freeUsed < DAILY_FREE_LIMIT ? "free" : "premium";
       const nextUsageState =
-        refreshedUsageState.freeUsed < DAILY_FREE_LIMIT
-          ? { ...refreshedUsageState, freeUsed: refreshedUsageState.freeUsed + 1 }
-          : { ...refreshedUsageState, paidCredits: Math.max(refreshedUsageState.paidCredits - 1, 0) };
+        before.freeUsed < DAILY_FREE_LIMIT
+          ? { ...before, freeUsed: before.freeUsed + 1 }
+          : { ...before, paidCredits: Math.max(before.paidCredits - 1, 0) };
       saveUsageState(nextUsageState);
 
+      setLastPlanMode(formData.planMode);
+      setGenerationTier(tier);
       setGeneratedPlan(data);
       toast.success("Your trip is ready", {
         description: "Scroll to explore your itinerary and map.",
@@ -203,8 +212,8 @@ export default function PlannerShell() {
       key: razorpayKey,
       amount: 9900,
       currency: "INR",
-      name: "EpicIndiaTrips AI Planner",
-      description: "Premium travel plan — PDF, hidden gems, reel scripts & budget breakdown",
+      name: "Unlock Premium Travel Plan",
+      description: "Hidden gems · Creator spots · PDF · Budget breakdown",
       handler: () => {
         const currentUsage = getUsageState();
         const nextUsage = { ...currentUsage, paidCredits: currentUsage.paidCredits + 1 };
@@ -212,8 +221,8 @@ export default function PlannerShell() {
         setShowUpgradeModal(false);
         setError(null);
         setIsPaying(false);
-        toast.success("Premium unlocked", {
-          description: "Generate your full plan with PDF, hidden gems, reels & budget.",
+        toast.success("Unlock Premium Travel Plan", {
+          description: "You’re in — hidden gems, creator spots, PDF & budget breakdown on your next generations.",
         });
       },
       theme: {
@@ -227,7 +236,7 @@ export default function PlannerShell() {
   };
 
   return (
-    <div className="space-y-4 pb-28 sm:pb-10">
+    <div className="space-y-8 pb-28 sm:space-y-10 sm:pb-12">
       <InputForm
         formData={formData}
         setFormData={setFormData}
@@ -253,95 +262,25 @@ export default function PlannerShell() {
             transition={{ duration: 0.5, ease: EASE_APPLE }}
             className="pt-2"
           >
-            <PlanOutput result={generatedPlan} />
+            <PlanOutput
+              result={generatedPlan}
+              destination={formData.destination}
+              planMode={lastPlanMode}
+              generationTier={generationTier}
+              onUpgrade={() => setShowUpgradeModal(true)}
+            />
           </motion.div>
         ) : null}
       </AnimatePresence>
 
       <FloatingCta onClick={scrollToForm} />
 
-      <AnimatePresence>
-        {showUpgradeModal ? (
-          <motion.div
-            key="upgrade-backdrop"
-            className="fixed inset-0 z-50 flex items-center justify-center bg-stone-950/55 p-4 backdrop-blur-sm"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.35, ease: EASE_APPLE }}
-            onClick={() => setShowUpgradeModal(false)}
-            role="presentation"
-          >
-            <motion.div
-              role="dialog"
-              aria-modal="true"
-              aria-labelledby="upgrade-title"
-              className="relative w-full max-w-md overflow-hidden rounded-[1.75rem] border border-white/20 bg-white p-8 shadow-2xl"
-              initial={{ opacity: 0, y: 24, scale: 0.97 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 16, scale: 0.98 }}
-              transition={{ duration: 0.35, ease: EASE_APPLE }}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div
-                className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-[#FF6B35] via-[#ff8f66] to-[#ffb347]"
-                aria-hidden
-              />
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#FF6B35]">Premium bundle</p>
-              <h3 id="upgrade-title" className="mt-2 text-2xl font-semibold tracking-tight text-stone-900">
-                Unlock Premium Travel Plan
-              </h3>
-              <p className="mt-3 text-sm leading-relaxed text-stone-600">
-                You&apos;ve used today&apos;s complimentary generation. One unlock includes everything below — not
-                just another run.
-              </p>
-
-              <ul className="mt-6 space-y-3 rounded-2xl border border-stone-100 bg-stone-50/80 px-4 py-4">
-                {[
-                  { title: "PDF", detail: "Print-ready itinerary download" },
-                  { title: "Hidden gems", detail: "Offbeat stops & local picks in your route" },
-                  { title: "Reel scripts", detail: "Hooks, captions & hashtags ready to shoot" },
-                  { title: "Budget breakdown", detail: "Stay, food & transport in one view" },
-                ].map((item) => (
-                  <li key={item.title} className="flex gap-3 text-sm text-stone-700">
-                    <Check
-                      className="mt-0.5 h-4 w-4 shrink-0 text-[#FF6B35]"
-                      strokeWidth={2.25}
-                      aria-hidden
-                    />
-                    <span>
-                      <span className="font-semibold text-stone-900">{item.title}</span>
-                      <span className="text-stone-500"> — {item.detail}</span>
-                    </span>
-                  </li>
-                ))}
-              </ul>
-
-              <p className="mt-4 text-center text-xs text-stone-500">
-                ₹99 one-time · secure checkout
-              </p>
-
-              <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-                <button
-                  type="button"
-                  onClick={() => setShowUpgradeModal(false)}
-                  className="w-full rounded-2xl border border-stone-200 bg-white px-4 py-3 text-sm font-semibold text-stone-600 transition hover:bg-stone-50"
-                >
-                  Maybe later
-                </button>
-                <button
-                  type="button"
-                  onClick={handleUpgrade}
-                  disabled={isPaying}
-                  className="w-full rounded-2xl bg-gradient-to-r from-stone-900 to-stone-800 px-4 py-3 text-sm font-semibold text-white shadow-lg transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60"
-                >
-                  {isPaying ? "Opening checkout…" : "Unlock Premium Travel Plan"}
-                </button>
-              </div>
-            </motion.div>
-          </motion.div>
-        ) : null}
-      </AnimatePresence>
+      <PaywallModal
+        open={showUpgradeModal}
+        onClose={() => setShowUpgradeModal(false)}
+        onUnlock={handleUpgrade}
+        isPaying={isPaying}
+      />
     </div>
   );
 }

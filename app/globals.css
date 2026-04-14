@@ -1,10 +1,17 @@
 @import "tailwindcss";
 
 :root {
-  --background: #faf8f4;
-  --foreground: #1c1917;
-  --brand-accent: #ff6b35;
-  --brand-mist: rgba(255, 255, 255, 0.78);
+  /* Calm editorial — minimal luxury */
+  --background: #f6f5f2;
+  --foreground: #14120f;
+  --surface-page: #f6f5f2;
+  --surface-elevated: #ffffff;
+  --border-subtle: rgba(15, 23, 42, 0.06);
+  --brand-accent: #c2410c;
+  --brand-accent-soft: rgba(194, 65, 12, 0.1);
+  --brand-mist: rgba(255, 255, 255, 0.82);
+  --space-section: clamp(3.5rem, 8vw, 6rem);
+  --space-block: clamp(1.75rem, 4vw, 2.75rem);
 }
 
 @theme inline {
@@ -33,6 +40,8 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  font-feature-settings: "kern" 1, "liga" 1;
+  -webkit-font-smoothing: antialiased;
 }
 
 /* Leaflet divIcon: numbered route pins */
@@ -82,20 +91,48 @@ body {
     white-space: normal;
     padding: 0.625rem 1rem;
     border-radius: 0.5rem;
-    background-color: #1c1917;
+    background-color: #14120f;
     color: #fff;
     font-size: 0.875rem;
     font-weight: 600;
     box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2);
-    outline: 2px solid #ff6b35;
+    outline: 2px solid rgba(15, 23, 42, 0.35);
     outline-offset: 2px;
   }
 
   .text-gradient-brand {
-    background: linear-gradient(135deg, #1c1917 0%, #44403c 45%, #ff6b35 100%);
+    background: linear-gradient(135deg, #14120f 0%, #44403c 50%, #57534e 100%);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
+  }
+
+  /** Minimal type scale — use for section chrome */
+  .type-eyebrow {
+    font-size: 0.625rem;
+    font-weight: 500;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: rgb(120 113 108);
+  }
+
+  .type-display {
+    font-size: clamp(1.5rem, 2.5vw, 2rem);
+    font-weight: 300;
+    letter-spacing: -0.03em;
+    line-height: 1.2;
+    color: rgb(28 25 23);
+  }
+
+  .type-body-muted {
+    font-size: 0.9375rem;
+    line-height: 1.65;
+    color: rgb(87 83 78);
+  }
+
+  .section-y {
+    padding-top: var(--space-section);
+    padding-bottom: var(--space-section);
   }
 
   .surface-hero {

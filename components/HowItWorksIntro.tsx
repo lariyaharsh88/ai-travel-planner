@@ -1,15 +1,15 @@
 export default function HowItWorksIntro() {
   return (
-    <div className="max-w-xl">
+    <div className="max-w-md">
+      <p className="type-eyebrow">Flow</p>
       <h2
         id="how-it-works-heading"
-        className="text-lg font-semibold tracking-tight text-stone-900 sm:text-xl"
+        className="type-display mt-4 text-[1.375rem] sm:text-[1.5rem]"
       >
-        How it works
+        One brief, full output
       </h2>
-      <p className="mt-1.5 text-sm leading-relaxed text-stone-700">
-        Share destination, budget, and vibe — we return a day-wise plan, map pins, spend notes, reels, and a blog
-        draft.
+      <p className="type-body-muted mt-5">
+        Destination and preferences in — itinerary, map, and creator-ready assets out. No separate tools.
       </p>
     </div>
   );

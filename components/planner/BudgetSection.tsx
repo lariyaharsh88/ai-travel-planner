@@ -19,9 +19,7 @@ type BudgetSectionProps = {
 export default function BudgetSection({ budget }: BudgetSectionProps) {
   return (
     <PremiumInteractiveCard className="p-5 sm:p-6" hoverLift={5}>
-      <h3 className="text-lg font-semibold text-stone-900">Budget breakdown</h3>
-      <p className="mt-1 text-xs text-stone-500">Rough split to guide planning</p>
-      <div className="mt-5 grid gap-3 sm:grid-cols-3">
+      <div className="grid gap-3 sm:grid-cols-3">
         {items.map(({ key, label, icon: Icon }, i) => (
           <motion.div
             key={key}

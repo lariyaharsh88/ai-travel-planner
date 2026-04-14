@@ -1,13 +1,17 @@
 /** One timed stop in the day (meal, sight, walk, etc.) */
 export type ScheduleStop = {
-  /** e.g. "9:00 AM", "1:30 PM" */
+  /** Start time (keep for ordering), e.g. "9:00 AM" */
   time: string;
+  /** Full block, e.g. "9:00–10:30 AM" — prefer showing this in UI when set */
+  timeSlot?: string;
   activity: string;
   place: string;
-  /** e.g. "₹150–300", "Free", "~₹500" */
+  /** Prefer exact amounts: "₹180" or "₹45/person"; tight ranges only when necessary */
   estimatedCost: string;
-  /** Local insight, e.g. "Avoid crowds after 5 PM" */
+  /** Practical: gate, queue, booking — must be specific to this place, not generic travel advice */
   localTip?: string;
+  /** Hyper-specific: named dish, stall, timing, neighborhood detail (non-generic) */
+  localInsight?: string;
   /** Full Google Maps URL (place or search link) */
   mapsLink: string;
   /** True if this is an offbeat / lesser-known spot (not a typical top-5 tourist trap) */
@@ -20,8 +24,14 @@ export type TravelLeg = {
   toPlace: string;
   /** e.g. "~25 min", "15 min walk" */
   duration: string;
+  /** Approximate distance for this leg, e.g. "~3.2 km" or "800 m walk" */
+  distance?: string;
   /** e.g. "Metro", "Auto", "Walk", "Cab" */
   mode?: string;
+  /** Concrete path: stations/lines/roads/exits — real-world navigable detail */
+  route?: string;
+  /** Fare for this leg only, e.g. "₹20 metro ×2" or "₹280 Uber" */
+  legCost?: string;
   /** e.g. "Heavy traffic 6–8 PM" */
   note?: string;
 };
@@ -33,6 +43,11 @@ export type DayPlan = {
   schedule: ScheduleStop[];
   /** travelLegs[i] = travel after schedule[i] to schedule[i+1]; length should be schedule.length - 1 (or empty if one stop) */
   travelLegs: TravelLeg[];
+  /**
+   * Estimated spend for this day only: entries, meals, local transport, activities
+   * (exclude whole-trip stay unless the prompt states otherwise).
+   */
+  estimatedDayCost?: string;
 };
 
 export type BudgetBreakdown = {
@@ -43,6 +58,8 @@ export type BudgetBreakdown = {
 
 export type ReelIdea = {
   hook: string;
+  /** 15–40s beat-by-beat or shot list for filming */
+  script?: string;
   caption: string;
   hashtags: string[];
 };
@@ -71,9 +88,17 @@ export type PhotoAngle = {
   lighting: string;
 };
 
+/** SEO-oriented section for long-form export */
+export type BlogSectionBlock = {
+  heading: string;
+  body: string;
+};
+
 export type BlogContent = {
   title: string;
   preview: string;
+  /** Optional H2-style sections with body copy — good for SEO outlines */
+  seoSections?: BlogSectionBlock[];
 };
 
 export type TravelPlanResponse = {

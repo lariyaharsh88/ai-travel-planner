@@ -16,16 +16,22 @@ export const enterSoftTransition: Transition = {
   ease: EASE_APPLE_SOFT,
 };
 
+/** Section list items — soft, less motion sickness */
+export const sectionItemTransition: Transition = {
+  duration: 0.68,
+  ease: EASE_APPLE_SOFT,
+};
+
 /** Micro-interaction spring — crisp but not bouncy */
 export const springTap: Transition = {
   type: "spring",
-  stiffness: 520,
-  damping: 38,
-  mass: 0.85,
+  stiffness: 480,
+  damping: 42,
+  mass: 0.88,
 };
 
 export const springGentle: Transition = {
   type: "spring",
-  stiffness: 320,
-  damping: 32,
+  stiffness: 280,
+  damping: 36,
 };

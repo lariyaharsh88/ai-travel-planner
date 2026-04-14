@@ -1,14 +1,13 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { MapPinned } from "lucide-react";
 import PremiumInteractiveCard from "@/components/ui/PremiumInteractiveCard";
 import type { MapRoutePoint } from "@/lib/travel-plan";
 
 const ItineraryMap = dynamic(() => import("@/components/ItineraryMap"), {
   ssr: false,
   loading: () => (
-    <div className="flex h-52 w-full items-center justify-center rounded-xl border border-stone-100 bg-stone-50/90 text-sm text-stone-500 sm:h-60">
+    <div className="flex min-h-[min(22rem,70vh)] w-full items-center justify-center rounded-2xl border border-stone-100/80 bg-stone-50/50 text-sm text-stone-400">
       Loading map…
     </div>
   ),
@@ -16,23 +15,20 @@ const ItineraryMap = dynamic(() => import("@/components/ItineraryMap"), {
 
 type MapSectionProps = {
   route: MapRoutePoint[];
+  destination: string;
 };
 
-export default function MapSection({ route }: MapSectionProps) {
+export default function MapSection({ route, destination }: MapSectionProps) {
+  const n = route.length;
+  const summary = n <= 1 ? "One stop" : `${n} stops · ordered route`;
+
   return (
-    <PremiumInteractiveCard className="p-5 sm:p-6" hoverLift={6}>
-      <div className="pointer-events-none absolute inset-x-0 top-0 z-[2] h-px bg-gradient-to-r from-transparent via-[#FF6B35]/30 to-transparent" />
-      <div className="mb-4 flex items-center gap-2">
-        <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-stone-900 text-white shadow-md transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-105 group-hover:shadow-lg">
-          <MapPinned className="h-4 w-4" strokeWidth={1.75} />
-        </span>
-        <div>
-          <h3 className="text-lg font-semibold text-stone-900">Itinerary map</h3>
-          <p className="text-xs text-stone-500">Route line + numbered pins in trip order (OpenStreetMap)</p>
-        </div>
+    <PremiumInteractiveCard className="overflow-hidden p-0 sm:p-0" hoverLift={2}>
+      <div className="border-b border-stone-100/80 bg-stone-50/30 px-5 py-3.5 sm:px-6">
+        <p className="text-[11px] font-medium tracking-wide text-stone-500">{summary}</p>
       </div>
-      <div className="overflow-hidden rounded-2xl border border-stone-100 shadow-inner transition-shadow duration-500 group-hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.6)]">
-        <ItineraryMap route={route} />
+      <div className="overflow-hidden rounded-b-[1.75rem]">
+        <ItineraryMap route={route} destination={destination} />
       </div>
     </PremiumInteractiveCard>
   );

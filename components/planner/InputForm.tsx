@@ -6,7 +6,8 @@ import { FormEvent } from "react";
 import BudgetDaysControls from "@/components/BudgetDaysControls";
 import DestinationCombobox from "@/components/DestinationCombobox";
 import PremiumInteractiveForm from "@/components/ui/PremiumInteractiveForm";
-import { EASE_APPLE, springGentle } from "@/lib/motion-premium";
+import { EASE_APPLE, EASE_APPLE_SOFT, springGentle } from "@/lib/motion-premium";
+import { type PlanMode } from "@/lib/plan-mode";
 import { TRAVEL_STYLES, type TravelStyleValue } from "@/lib/travel-styles";
 
 const interestsList = [
@@ -25,6 +26,7 @@ export type InputFormData = {
   days: number;
   travelStyle: TravelStyleValue;
   interests: Interest[];
+  planMode: PlanMode;
 };
 
 type InputFormProps = {
@@ -61,42 +63,76 @@ export default function InputForm({
       initial={{ opacity: 0, y: 22 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-60px" }}
-      transition={{ duration: 0.62, ease: EASE_APPLE }}
-      className="p-4 sm:p-5"
-      hoverLift={5}
+      transition={{ duration: 0.75, ease: EASE_APPLE_SOFT }}
+      className="p-8 sm:p-10"
+      hoverLift={2}
     >
-      <div
-        className="pointer-events-none absolute inset-x-0 top-0 z-[2] h-1 rounded-t-[1.35rem] bg-gradient-to-r from-[#FF6B35] via-[#ff8f66] to-[#ffb347]"
-        aria-hidden
-      />
-
-      <div className="mb-4 flex flex-wrap items-end justify-between gap-3 sm:mb-5">
-        <div>
-          <h3 className="text-xl font-semibold tracking-tight text-stone-900 sm:text-2xl">
-            Your trip details
-          </h3>
-          <p className="mt-1 text-sm text-stone-700">
-            We’ll build a day-wise plan, map pins, budget, and content ideas.
+      <div className="mb-10 flex flex-wrap items-end justify-between gap-6">
+        <div className="min-w-0 flex-1">
+          <p className="type-eyebrow text-[#c2410c]/90">Plan</p>
+          <h3 className="type-display mt-3 text-[1.375rem] sm:text-[1.5rem]">Your trip, one brief</h3>
+          <p className="type-body-muted mt-4 max-w-md">
+            Route, timing, and creator outputs — minimal inputs, maximum clarity.
           </p>
         </div>
         <motion.span
-          initial={{ opacity: 0, scale: 0.96 }}
+          initial={{ opacity: 0, scale: 0.98 }}
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true }}
           transition={springGentle}
-          className="rounded-full bg-stone-100 px-3 py-1 text-[11px] font-medium uppercase tracking-wider text-stone-700"
+          className="shrink-0 rounded-full border border-stone-200/80 bg-stone-50/80 px-3 py-1.5 text-[10px] font-medium uppercase tracking-[0.18em] text-stone-500"
         >
           1 free / day
         </motion.span>
       </div>
 
-      <div className="space-y-4 sm:space-y-5">
+      <div className="mb-10">
+        <p id="plan-mode-label" className="type-eyebrow mb-4">
+          Plan type
+        </p>
+        <div
+          className="grid grid-cols-1 gap-2 sm:grid-cols-2"
+          role="radiogroup"
+          aria-labelledby="plan-mode-label"
+        >
+          {(
+            [
+              { value: "standard" as const, title: "Trip-first", desc: "Route, map, and budget." },
+              { value: "creator" as const, title: "Creator", desc: "Spots, reels, angles, and light." },
+            ] as const
+          ).map(({ value, title, desc }) => {
+            const active = formData.planMode === value;
+            return (
+              <motion.button
+                key={value}
+                type="button"
+                role="radio"
+                aria-checked={active}
+                onClick={() => setFormData((prev) => ({ ...prev, planMode: value }))}
+                whileHover={{ y: -1, transition: { duration: 0.45, ease: EASE_APPLE_SOFT } }}
+                whileTap={{ scale: 0.99 }}
+                transition={springGentle}
+                className={`rounded-2xl border px-4 py-4 text-left transition-shadow duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stone-400/40 ${
+                  active
+                    ? "border-stone-900/15 bg-stone-50 text-stone-900 shadow-[0_12px_40px_-28px_rgba(15,23,42,0.12)]"
+                    : "border-stone-200/80 bg-white text-stone-800 hover:border-stone-300/90"
+                }`}
+              >
+                <span className="block text-sm font-medium tracking-tight">{title}</span>
+                <span className="mt-1.5 block text-[13px] font-normal leading-snug text-stone-500">{desc}</span>
+              </motion.button>
+            );
+          })}
+        </div>
+      </div>
+
+      <div className="space-y-8 sm:space-y-12">
         <div className="relative">
           <label
             htmlFor="destination"
-            className="mb-2 flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-stone-700"
+            className="type-eyebrow mb-3 flex items-center gap-2"
           >
-            <MapPin className="h-3.5 w-3.5 shrink-0 text-[#FF6B35]" aria-hidden />
+            <MapPin className="h-3.5 w-3.5 shrink-0 text-stone-400" aria-hidden />
             Destination
           </label>
           <DestinationCombobox
@@ -106,8 +142,8 @@ export default function InputForm({
             required
             describedBy="destination-hint"
           />
-          <p id="destination-hint" className="mt-2 text-xs text-stone-600">
-            Search popular places or type your own.
+          <p id="destination-hint" className="mt-3 text-sm text-stone-500">
+            Search or type any place.
           </p>
         </div>
 
@@ -119,7 +155,7 @@ export default function InputForm({
         />
 
         <div>
-          <p id="travel-style-label" className="mb-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-stone-700">
+          <p id="travel-style-label" className="type-eyebrow mb-4">
             Travel style
           </p>
           <div
@@ -136,17 +172,23 @@ export default function InputForm({
                   role="radio"
                   aria-checked={active}
                   onClick={() => setFormData((prev) => ({ ...prev, travelStyle: s.value }))}
-                  whileHover={{ y: -2, transition: { duration: 0.35, ease: EASE_APPLE } }}
-                  whileTap={{ scale: 0.97 }}
+                  whileHover={{ y: -1, transition: { duration: 0.45, ease: EASE_APPLE_SOFT } }}
+                  whileTap={{ scale: 0.99 }}
                   transition={springGentle}
-                  className={`rounded-full border px-4 py-2 text-left text-sm font-medium transition-shadow duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FF6B35] ${
+                  className={`rounded-full border px-4 py-2.5 text-left text-sm font-medium transition-colors duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stone-400/40 ${
                     active
-                      ? "border-[#FF6B35]/50 bg-gradient-to-br from-[#FF6B35]/12 to-amber-50/80 text-stone-900 shadow-[0_8px_24px_-12px_rgba(255,107,53,0.45)]"
-                      : "border-stone-200/90 bg-white text-stone-700 shadow-sm hover:border-stone-300/90 hover:shadow-md"
+                      ? "border-stone-800/20 bg-stone-900 text-white"
+                      : "border-stone-200/90 bg-white text-stone-700 hover:border-stone-300"
                   }`}
                 >
                   <span className="block capitalize">{s.label}</span>
-                  <span className="mt-0.5 block text-[11px] font-normal text-stone-600">{s.hint}</span>
+                  <span
+                    className={`mt-0.5 block text-[11px] font-normal ${
+                      active ? "text-stone-300" : "text-stone-500"
+                    }`}
+                  >
+                    {s.hint}
+                  </span>
                 </motion.button>
               );
             })}
@@ -154,7 +196,7 @@ export default function InputForm({
         </div>
 
         <div>
-          <p id="interests-label" className="mb-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-stone-700">
+          <p id="interests-label" className="type-eyebrow mb-4">
             Interests
           </p>
           <div className="flex flex-wrap gap-2" role="group" aria-labelledby="interests-label">
@@ -166,13 +208,13 @@ export default function InputForm({
                   type="button"
                   aria-pressed={checked}
                   onClick={() => toggleInterest(interest)}
-                  whileHover={{ y: -2, scale: 1.02 }}
-                  whileTap={{ scale: 0.96 }}
+                  whileHover={{ y: -1 }}
+                  whileTap={{ scale: 0.98 }}
                   transition={springGentle}
-                  className={`rounded-full border px-3.5 py-2 text-xs font-medium capitalize transition-colors duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FF6B35] ${
+                  className={`rounded-full border px-3.5 py-2 text-xs font-medium capitalize transition-colors duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stone-400/40 ${
                     checked
-                      ? "border-[#FF6B35]/45 bg-stone-900 text-white shadow-md shadow-stone-900/20"
-                      : "border-stone-200 bg-white text-stone-700 hover:border-stone-300 hover:shadow-sm"
+                      ? "border-stone-800 bg-stone-900 text-white"
+                      : "border-stone-200/90 bg-white text-stone-600 hover:border-stone-300"
                   }`}
                 >
                   {interest}
@@ -199,10 +241,10 @@ export default function InputForm({
         type="submit"
         disabled={isLoading}
         aria-busy={isLoading}
-        whileHover={isLoading ? undefined : { scale: 1.015, transition: { duration: 0.4, ease: EASE_APPLE } }}
-        whileTap={isLoading ? undefined : { scale: 0.992 }}
+        whileHover={isLoading ? undefined : { scale: 1.01, transition: { duration: 0.5, ease: EASE_APPLE_SOFT } }}
+        whileTap={isLoading ? undefined : { scale: 0.995 }}
         transition={springGentle}
-        className="mt-6 flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-stone-900 via-stone-900 to-stone-800 px-5 py-3.5 text-sm font-semibold text-white shadow-[0_12px_40px_-12px_rgba(28,25,23,0.55)] ring-1 ring-white/10 transition-[box-shadow] duration-500 hover:shadow-[0_20px_50px_-8px_rgba(255,107,53,0.32)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FF6B35] disabled:cursor-not-allowed disabled:opacity-55 sm:text-base"
+        className="mt-6 flex w-full items-center justify-center gap-2 rounded-2xl bg-[#14120f] px-5 py-4 text-sm font-medium text-white shadow-[0_12px_40px_-16px_rgba(15,23,42,0.35)] transition-[box-shadow,transform] duration-500 hover:shadow-[0_20px_48px_-20px_rgba(15,23,42,0.28)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stone-400 disabled:cursor-not-allowed disabled:opacity-55 sm:text-[0.9375rem]"
       >
         {isLoading ? (
           <>
