@@ -24,16 +24,15 @@ export default function PlanModeToggle({
   const creatorOn = value === "creator";
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="min-w-0">
           <p id={`${id}-label`} className="type-eyebrow">
             Plan mode
           </p>
-          <p className="mt-2 text-sm leading-relaxed text-stone-600">
-            <span className="font-medium text-stone-800">Normal</span> is pure itinerary & map.{" "}
-            <span className="font-medium text-stone-800">Creator</span> adds reels, IG spots, angles, and light windows —
-            built for posting.
+          <p className="mt-2 max-w-md text-sm leading-relaxed text-stone-600">
+            <span className="font-medium text-stone-800">Trip</span> prioritises route and map.{" "}
+            <span className="font-medium text-stone-800">Creator</span> layers reels, shots, and light.
           </p>
         </div>
 
@@ -55,16 +54,16 @@ export default function PlanModeToggle({
             aria-labelledby={`${id}-label`}
             disabled={disabled}
             onClick={() => onChange(creatorOn ? "standard" : "creator")}
-            className="relative h-11 w-[4.25rem] shrink-0 rounded-full border border-stone-200/90 bg-stone-100/90 shadow-inner transition-[background,border-color,box-shadow] duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#c2410c]/50 disabled:cursor-not-allowed disabled:opacity-50 data-[on=true]:border-[#c2410c]/25 data-[on=true]:bg-gradient-to-r data-[on=true]:from-amber-50 data-[on=true]:via-orange-50/90 data-[on=true]:to-violet-100/80 data-[on=true]:shadow-[0_8px_32px_-12px_rgba(194,65,12,0.35)]"
+            className="relative h-11 w-[4.25rem] shrink-0 rounded-full border border-stone-200/90 bg-stone-100/90 shadow-inner transition-[background,border-color,box-shadow] duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#c2410c]/45 disabled:cursor-not-allowed disabled:opacity-50 data-[on=true]:border-[#c2410c]/20 data-[on=true]:bg-gradient-to-r data-[on=true]:from-amber-50/95 data-[on=true]:to-orange-50/80 data-[on=true]:shadow-[0_6px_28px_-14px_rgba(194,65,12,0.28)]"
             data-on={creatorOn}
           >
             <motion.span
               initial={false}
               animate={{ x: creatorOn ? 30 : 0 }}
               transition={springGentle}
-              className={`absolute left-1 top-1 flex h-9 w-9 items-center justify-center rounded-full shadow-md ring-1 ring-black/[0.06] ${
+              className={`absolute left-1 top-1 flex h-9 w-9 items-center justify-center rounded-full shadow-md ring-1 ring-black/[0.05] ${
                 creatorOn
-                  ? "bg-gradient-to-br from-[#c2410c] to-violet-600 text-white"
+                  ? "bg-gradient-to-br from-[#c2410c] to-[#ea580c] text-white"
                   : "bg-white text-stone-600"
               }`}
             >
@@ -93,20 +92,19 @@ export default function PlanModeToggle({
         transition={{ duration: 0.45, ease: EASE_APPLE_SOFT }}
         className={`rounded-2xl border px-4 py-3 text-[13px] leading-relaxed transition-colors duration-300 ${
           creatorOn
-            ? "border-[#c2410c]/20 bg-gradient-to-br from-amber-50/80 via-white to-violet-50/60 text-stone-800"
-            : "border-stone-200/80 bg-stone-50/50 text-stone-600"
+            ? "border-[#c2410c]/18 bg-gradient-to-br from-amber-50/70 via-white to-orange-50/40 text-stone-800"
+            : "border-stone-200/70 bg-stone-50/40 text-stone-600"
         }`}
       >
         {creatorOn ? (
           <>
-            <span className="font-semibold text-[#9a3412]">Creator mode on — </span>
-            we’ll generate Instagram spots, reel hooks & captions, camera angles (wide / drone / POV), and golden-hour
-            friendly timing.
+            <span className="font-semibold text-[#9a3412]">Creator — </span>
+            Spots, reels, angles, and golden-hour timing in your export.
           </>
         ) : (
           <>
-            <span className="font-semibold text-stone-800">Trip mode — </span>
-            fastest path to a practical route, map, and budget. Switch to Creator anytime before you generate.
+            <span className="font-semibold text-stone-800">Trip — </span>
+            Route, map, and budget first. Switch before you generate.
           </>
         )}
       </motion.div>

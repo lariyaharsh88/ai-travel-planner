@@ -61,33 +61,24 @@ export default function InputForm({
     <PremiumInteractiveForm
       id="planner-form"
       onSubmit={onSubmit}
-      initial={{ opacity: 0, y: 22 }}
+      initial={{ opacity: 0, y: 14 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-60px" }}
-      transition={{ duration: 0.75, ease: EASE_APPLE_SOFT }}
-      className="p-8 sm:p-10"
+      viewport={{ once: true, margin: "-48px" }}
+      transition={{ duration: 0.72, ease: EASE_APPLE_SOFT }}
+      className="p-7 sm:p-9"
       hoverLift={2}
     >
-      <div className="mb-10 flex flex-wrap items-end justify-between gap-6">
-        <div className="min-w-0 flex-1">
-          <p className="type-eyebrow text-[#c2410c]/90">Plan</p>
+      <div className="mb-8 sm:mb-9">
+        <div className="min-w-0">
+          <p className="type-eyebrow text-[#c2410c]/85">Plan</p>
           <h3 className="type-display-lg mt-3 text-balance">Your trip, one brief</h3>
-          <p className="type-body-muted mt-4 max-w-md">
+          <p className="type-body-muted mt-3 max-w-[42ch]">
             Creator Mode adds reels, IG spots, and camera angles — or stay on Normal for a trip-first plan.
           </p>
         </div>
-        <motion.span
-          initial={{ opacity: 0, scale: 0.98 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          viewport={{ once: true }}
-          transition={springGentle}
-          className="shrink-0 rounded-full border border-stone-200/80 bg-stone-50/80 px-3 py-1.5 text-[10px] font-medium uppercase tracking-[0.18em] text-stone-500"
-        >
-          1 free / day
-        </motion.span>
       </div>
 
-      <div className="mb-10">
+      <div className="mb-8 sm:mb-9">
         <PlanModeToggle
           value={formData.planMode}
           disabled={isLoading}
@@ -95,7 +86,7 @@ export default function InputForm({
         />
       </div>
 
-      <div className="space-y-8 sm:space-y-12">
+      <div className="space-y-7 sm:space-y-10">
         <div className="relative">
           <label
             htmlFor="destination"
@@ -217,7 +208,7 @@ export default function InputForm({
         }
         whileTap={isLoading ? undefined : { scale: 0.988 }}
         transition={springGentle}
-        className="group relative mt-8 flex w-full items-center justify-center gap-2 overflow-hidden rounded-[1.125rem] bg-[#14120f] px-5 py-4 text-sm font-semibold text-white shadow-[0_14px_44px_-18px_rgba(15,23,42,0.4)] ring-1 ring-white/10 transition-[box-shadow] duration-500 hover:shadow-[0_22px_56px_-22px_rgba(15,23,42,0.38)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stone-400 disabled:cursor-not-allowed disabled:opacity-55 sm:mt-10 sm:py-[1.125rem] sm:text-[0.9375rem]"
+        className="group relative mt-7 flex min-h-[48px] w-full items-center justify-center gap-2 overflow-hidden rounded-[1.125rem] bg-[#14120f] px-5 py-3.5 text-sm font-semibold text-white shadow-[0_14px_44px_-18px_rgba(15,23,42,0.36)] ring-1 ring-white/10 transition-[box-shadow] duration-500 hover:shadow-[0_20px_52px_-22px_rgba(15,23,42,0.34)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stone-400 disabled:cursor-not-allowed disabled:opacity-55 sm:mt-9 sm:min-h-[52px] sm:py-[0.9375rem] sm:text-[0.9375rem]"
       >
         <span
           className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"

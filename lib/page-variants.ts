@@ -15,22 +15,22 @@ export const homeGridContainer: Variants = {
 };
 
 export const homeColumnLeft: Variants = {
-  hidden: { opacity: 0, x: -8, y: 8 },
+  hidden: { opacity: 0, x: -6, y: 6 },
   visible: {
     opacity: 1,
     x: 0,
     y: 0,
-    transition: { duration: 0.82, ease: EASE_APPLE_SOFT },
+    transition: { duration: 0.78, ease: EASE_APPLE_SOFT },
   },
 };
 
 export const homeColumnRight: Variants = {
-  hidden: { opacity: 0, x: 8, y: 8 },
+  hidden: { opacity: 0, x: 6, y: 6 },
   visible: {
     opacity: 1,
     x: 0,
     y: 0,
-    transition: { duration: 0.82, ease: EASE_APPLE_SOFT },
+    transition: { duration: 0.78, ease: EASE_APPLE_SOFT },
   },
 };
 

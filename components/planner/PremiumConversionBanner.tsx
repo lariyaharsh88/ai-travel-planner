@@ -16,26 +16,28 @@ export default function PremiumConversionBanner({ onUnlock }: PremiumConversionB
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.55, ease: EASE_APPLE_SOFT }}
-      className="relative overflow-hidden rounded-2xl border border-amber-200/80 bg-gradient-to-r from-amber-50/95 via-white to-violet-50/90 p-4 shadow-[0_12px_40px_-24px_rgba(194,65,12,0.2)] sm:flex sm:items-center sm:justify-between sm:gap-6 sm:p-5"
+      className="relative overflow-hidden rounded-2xl border border-stone-200/80 bg-white/90 p-4 shadow-[0_8px_32px_-20px_rgba(15,23,42,0.08)] ring-1 ring-black/[0.02] sm:flex sm:items-center sm:justify-between sm:gap-6 sm:p-5"
     >
       <div
-        className="pointer-events-none absolute -right-12 -top-12 h-40 w-40 rounded-full bg-gradient-to-br from-amber-200/40 to-violet-200/30 blur-2xl"
+        className="pointer-events-none absolute -right-8 -top-8 h-32 w-32 rounded-full bg-gradient-to-br from-amber-100/50 to-transparent blur-2xl"
         aria-hidden
       />
       <div className="relative flex min-w-0 items-start gap-3 sm:items-center">
-        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-stone-900 text-amber-200 shadow-md">
+        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-stone-900 text-amber-200/95 shadow-sm">
           <Crown className="h-5 w-5" strokeWidth={1.5} aria-hidden />
         </span>
         <div className="min-w-0">
-          <p className="text-sm font-semibold text-stone-900">You&apos;re on a free preview</p>
+          <p className="text-sm font-semibold tracking-tight text-stone-900">Free preview</p>
           <p className="mt-1 text-xs leading-relaxed text-stone-600 sm:text-[13px]">
-            Unlock for every day of your trip, hidden gems, creator kit, budget lines, and PDF —{" "}
+            Full days, gems, creator kit, budget & PDF —{" "}
             <span className="font-semibold text-stone-800">₹99</span> once.
           </p>
         </div>
       </div>
       <div className="relative mt-4 shrink-0 sm:mt-0">
-        <UnlockPremiumButton onClick={onUnlock} size="sm" />
+        <UnlockPremiumButton onClick={onUnlock} size="sm">
+          Unlock Premium Travel Experience
+        </UnlockPremiumButton>
       </div>
     </motion.div>
   );

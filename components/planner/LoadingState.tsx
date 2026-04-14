@@ -15,11 +15,12 @@ type LoadingStep = {
 const STEPS: LoadingStep[] = [
   {
     id: "plan",
-    line: (d) => (d ? `Planning your trip to ${d}...` : "Planning your trip..."),
+    line: (d) =>
+      d ? `Planning your dream trip to ${d}…` : "Planning your dream trip…",
   },
-  { id: "gems", line: () => "Finding hidden gems..." },
-  { id: "budget", line: () => "Optimizing budget..." },
-  { id: "itinerary", line: () => "Designing your itinerary..." },
+  { id: "gems", line: () => "Finding hidden gems and local angles…" },
+  { id: "budget", line: () => "Optimizing your budget and day-wise spend…" },
+  { id: "itinerary", line: () => "Locking routes, times, and distances…" },
 ];
 
 type LoadingStateProps = {

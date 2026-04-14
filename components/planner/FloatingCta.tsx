@@ -28,10 +28,10 @@ export default function FloatingCta({ onClick, onUnlock, showUpgrade = false }: 
             whileHover={hoverLift}
             whileTap={{ scale: 0.98 }}
             transition={{ duration: 0.35, ease: EASE_APPLE_SOFT }}
-            aria-label="Unlock Premium Travel Plan"
+            aria-label="Unlock Premium Travel Experience"
           >
             <Sparkles className="h-4 w-4" aria-hidden />
-            Unlock Premium
+            Unlock — ₹99
           </motion.button>
         ) : null}
         <motion.button
@@ -58,7 +58,7 @@ export default function FloatingCta({ onClick, onUnlock, showUpgrade = false }: 
             className="flex min-h-[44px] w-full items-center justify-center gap-2 bg-gradient-to-r from-[#c2410c] to-[#ea580c] px-5 py-3.5 text-sm font-semibold text-white"
             whileTap={{ scale: 0.995 }}
             transition={{ duration: 0.25, ease: EASE_APPLE_SOFT }}
-            aria-label="Unlock Premium Travel Plan"
+            aria-label="Unlock Premium Travel Experience"
           >
             <Sparkles className="h-4 w-4" aria-hidden />
             Unlock Premium — ₹99

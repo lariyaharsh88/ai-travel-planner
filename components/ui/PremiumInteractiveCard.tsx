@@ -24,12 +24,12 @@ export default function PremiumInteractiveCard({
     <motion.div
       whileHover={whileHover}
       whileTap={whileTap}
-      transition={{ duration: 0.65, ease: EASE_APPLE_SOFT }}
-      className={`group ${baseCard} shadow-[var(--shadow-card)] transition-[box-shadow,border-color,transform] duration-[650ms] [transition-timing-function:cubic-bezier(0.16,1,0.32,1)] hover:border-black/[0.08] hover:shadow-[var(--shadow-card-hover)] ${className}`}
+      transition={{ duration: 0.52, ease: EASE_APPLE_SOFT }}
+      className={`group ${baseCard} shadow-[var(--shadow-card)] transition-[box-shadow,border-color,transform] duration-[520ms] [transition-timing-function:cubic-bezier(0.16,1,0.32,1)] hover:border-black/[0.07] hover:shadow-[var(--shadow-card-hover)] ${className}`}
       {...rest}
     >
       <div
-        className="pointer-events-none absolute inset-0 rounded-3xl opacity-0 transition-opacity duration-[650ms] ease-[cubic-bezier(0.16,1,0.32,1)] group-hover:opacity-100"
+        className="pointer-events-none absolute inset-0 rounded-3xl opacity-0 transition-opacity duration-[520ms] ease-[cubic-bezier(0.16,1,0.32,1)] group-hover:opacity-100"
         aria-hidden
         style={{
           background:

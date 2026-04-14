@@ -51,7 +51,7 @@ export default function PaywallModal({ open, onClose, onUnlock, isPaying }: Payw
             />
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-stone-500">EpicIndiaTrips AI Planner</p>
             <h3 id="paywall-title" className="mt-2 text-2xl font-semibold tracking-tight text-stone-900">
-              Unlock Premium Travel Plan
+              Unlock Premium Travel Experience
             </h3>
             <p className="mt-3 text-sm leading-relaxed text-stone-600">
               You&apos;ve hit the limit for today&apos;s free preview — or you want the full experience. One payment
@@ -84,7 +84,7 @@ export default function PaywallModal({ open, onClose, onUnlock, isPaying }: Payw
                   disabled={isPaying}
                   className={isPaying ? "pointer-events-none opacity-60" : ""}
                 >
-                  {isPaying ? "Opening secure checkout…" : "Unlock Premium Travel Plan"}
+                  {isPaying ? "Opening secure checkout…" : "Unlock Premium Travel Experience"}
                 </UnlockPremiumButton>
               </div>
             </div>

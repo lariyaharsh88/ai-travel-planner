@@ -88,9 +88,9 @@ export default function PlannerShell() {
     const usageState = getUsageState();
     if (!canGenerate(usageState)) {
       setShowUpgradeModal(true);
-      toast.message("Unlock Premium Travel Plan", {
+      toast.message("Unlock Premium Travel Experience", {
         description:
-          "You’ve used today’s free preview. ₹99 unlocks the full itinerary, hidden gems, creator kit, budget & PDF.",
+          "You’ve used today’s free preview. ₹99 unlocks the full itinerary, hidden gems, creator kit, day-wise budget, maps & PDF.",
       });
       return;
     }

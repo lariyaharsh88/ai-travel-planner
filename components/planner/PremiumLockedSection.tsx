@@ -21,7 +21,7 @@ type PremiumLockedSectionProps = {
 export default function PremiumLockedSection({
   locked,
   title,
-  subtitle = "Full itinerary, hidden gems, creator kit, PDF & budget — one unlock.",
+  subtitle = "Full itinerary, hidden gems, creator kit, PDF, day-wise budget & maps — one unlock.",
   onUnlock,
   children,
   className = "",

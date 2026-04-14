@@ -58,6 +58,8 @@ export type BudgetBreakdown = {
   stay: string;
   food: string;
   transport: string;
+  /** Whole-trip ballpark in INR (should align with per-day totals + stay where possible) */
+  totalTripCost?: string;
 };
 
 export type ReelIdea = {

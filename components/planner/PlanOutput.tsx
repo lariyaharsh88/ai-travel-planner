@@ -35,15 +35,15 @@ type PlanOutputProps = {
 const list = {
   visible: {
     transition: {
-      staggerChildren: 0.055,
-      delayChildren: 0.04,
+      staggerChildren: 0.065,
+      delayChildren: 0.06,
     },
   },
   hidden: {},
 };
 
 const item = {
-  hidden: { opacity: 0, y: 14 },
+  hidden: { opacity: 0, y: 10 },
   visible: {
     opacity: 1,
     y: 0,
@@ -53,17 +53,17 @@ const item = {
 
 const dayCardStagger = {
   visible: {
-    transition: { staggerChildren: 0.06, delayChildren: 0.04 },
+    transition: { staggerChildren: 0.052, delayChildren: 0.05 },
   },
   hidden: {},
 };
 
 const dayCardItem = {
-  hidden: { opacity: 0, y: 12 },
+  hidden: { opacity: 0, y: 10 },
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.62, ease: EASE_APPLE_SOFT },
+    transition: { duration: 0.68, ease: EASE_APPLE_SOFT },
   },
 };
 
@@ -198,7 +198,7 @@ export default function PlanOutput({
             subtitle="Stay, food, and transport in INR — lines you can use when booking."
             onUnlock={onUpgrade}
           >
-            <BudgetSection budget={result.budgetBreakdown} />
+            <BudgetSection budget={result.budgetBreakdown} dayWisePlan={result.dayWisePlan} />
           </PremiumLockedSection>
         </motion.div>
       ),
@@ -238,37 +238,37 @@ export default function PlanOutput({
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.65, ease: EASE_APPLE_SOFT }}
-        className="w-full space-y-24 text-left md:space-y-32"
+        className="w-full space-y-20 text-left md:space-y-28"
       >
         <TripPlanHero destination={dest} planMode={planMode} />
 
         {!isPremium ? <PremiumConversionBanner onUnlock={onUpgrade} /> : null}
 
-        <div className="flex flex-col items-stretch justify-between gap-8 border-b border-stone-200/80 pb-12 sm:flex-row sm:items-end sm:pb-14">
+        <div className="flex flex-col items-stretch justify-between gap-8 pb-10 sm:flex-row sm:items-end sm:gap-10 sm:pb-12">
           <motion.div
-            initial={{ opacity: 0, y: 14 }}
+            initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, ease: EASE_APPLE_SOFT }}
           >
-            <p className="type-eyebrow text-[#c2410c]/90">
+            <p className="type-eyebrow text-[#c2410c]/85">
               {creatorFirst ? "Creator plan" : "Trip plan"}
               {!isPremium ? (
-                <span className="ml-3 rounded-full bg-stone-100 px-2 py-0.5 text-[9px] font-medium tracking-[0.08em] text-stone-600">
-                  Free preview
+                <span className="ml-2.5 rounded-full bg-stone-100/90 px-2 py-0.5 text-[9px] font-medium tracking-[0.06em] text-stone-600">
+                  Preview
                 </span>
               ) : (
-                <span className="ml-3 rounded-full bg-emerald-50 px-2 py-0.5 text-[9px] font-medium tracking-[0.08em] text-emerald-800 ring-1 ring-emerald-200/80">
+                <span className="ml-2.5 rounded-full bg-emerald-50/95 px-2 py-0.5 text-[9px] font-medium tracking-[0.06em] text-emerald-800 ring-1 ring-emerald-200/70">
                   Premium
                 </span>
               )}
             </p>
-            <h2 className="type-display-lg mt-4 max-w-[22ch] text-balance">
+            <h2 className="type-display-lg mt-3 max-w-[24ch] text-balance">
               {creatorFirst ? `Shoot-ready plan for ${dest}` : `Trip plan for ${dest}`}
             </h2>
-            <p className="type-body-muted mt-5 max-w-md">
+            <p className="type-body-muted mt-3 max-w-md">
               {creatorFirst
                 ? "Creator content first — then route, map, and spend."
-                : "Route and map first — then creator content if you post."}
+                : "Route and map first — creator content when you need it."}
             </p>
           </motion.div>
           <motion.div
@@ -290,7 +290,8 @@ export default function PlanOutput({
           </motion.div>
         </div>
 
-        <motion.div variants={list} initial="hidden" animate="visible" className="space-y-20 md:space-y-28">
+        <div className="section-rule mb-2 opacity-80" aria-hidden />
+        <motion.div variants={list} initial="hidden" animate="visible" className="space-y-16 md:space-y-24">
           {sectionOrder.map((key) => sectionBlocks[key])}
         </motion.div>
       </motion.section>

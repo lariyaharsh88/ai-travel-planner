@@ -19,7 +19,7 @@ export default function UnlockPremiumButton({
   onClick,
   className = "",
   size = "default",
-  children = "Unlock Premium Travel Plan",
+  children = "Unlock Premium Travel Experience",
   disabled = false,
 }: UnlockPremiumButtonProps) {
   const sizeClass =
@@ -36,7 +36,7 @@ export default function UnlockPremiumButton({
       disabled={disabled}
       className={`relative inline-flex items-center justify-center gap-2 overflow-hidden rounded-2xl font-semibold text-white shadow-[0_12px_36px_-14px_rgba(194,65,12,0.55)] ring-1 ring-white/25 disabled:cursor-not-allowed disabled:opacity-55 ${sizeClass} ${className}`}
       whileHover={
-        disabled ? undefined : { scale: 1.03, transition: { duration: 0.35, ease: EASE_APPLE_SOFT } }
+        disabled ? undefined : { scale: 1.012, transition: { duration: 0.4, ease: EASE_APPLE_SOFT } }
       }
       whileTap={disabled ? undefined : { scale: 0.98 }}
       animate={

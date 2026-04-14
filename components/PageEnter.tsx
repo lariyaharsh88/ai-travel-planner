@@ -15,9 +15,9 @@ export default function PageEnter({ children, className = "" }: PageEnterProps) 
 
   return (
     <motion.div
-      initial={reduce ? false : { opacity: 0, y: 12 }}
+      initial={reduce ? false : { opacity: 0, y: 8 }}
       animate={reduce ? undefined : { opacity: 1, y: 0 }}
-      transition={{ duration: 0.82, ease: EASE_APPLE_SOFT }}
+      transition={{ duration: 0.76, ease: EASE_APPLE_SOFT }}
       className={className}
     >
       {children}

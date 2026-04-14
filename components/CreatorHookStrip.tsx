@@ -16,11 +16,11 @@ export default function CreatorHookStrip() {
   return (
     <motion.div
       id="creator-toolkit"
-      initial={{ opacity: 0, y: 16 }}
+      initial={{ opacity: 0, y: 12 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-40px" }}
-      transition={{ duration: 0.72, ease: EASE_APPLE_SOFT }}
-      className="relative overflow-hidden rounded-[1.75rem] border border-white/[0.06] bg-[#14120f] p-8 shadow-[0_28px_72px_-36px_rgba(0,0,0,0.55)] ring-1 ring-white/[0.04] sm:p-9"
+      viewport={{ once: true, margin: "-36px" }}
+      transition={{ duration: 0.76, ease: EASE_APPLE_SOFT }}
+      className="relative overflow-hidden rounded-[1.75rem] border border-white/[0.06] bg-[#14120f] p-7 shadow-[0_24px_64px_-32px_rgba(0,0,0,0.5)] ring-1 ring-white/[0.04] sm:p-8"
     >
       <div
         className="pointer-events-none absolute -right-16 -top-16 h-52 w-52 rounded-full bg-[#c2410c]/18 blur-3xl"
@@ -33,15 +33,15 @@ export default function CreatorHookStrip() {
 
       <div className="relative">
         <p className="type-eyebrow text-stone-500">For creators</p>
-        <h2 className="type-display mt-5 text-[1.25rem] text-white sm:text-[1.375rem]">
+        <h2 className="type-display mt-4 text-[1.25rem] text-white sm:text-[1.375rem]">
           Trip plan + content kit
         </h2>
-        <p className="mt-4 max-w-lg text-[0.9375rem] leading-relaxed text-stone-400">
-          Same run delivers routes and shoot-ready notes — not a generic wall of text.
+        <p className="mt-3 max-w-lg text-[0.9375rem] leading-relaxed text-stone-400">
+          Routes plus shoot-ready notes — one generation.
         </p>
 
         {reduce ? (
-          <ul className="mt-8 flex flex-wrap gap-2.5" aria-label="Creator deliverables">
+          <ul className="mt-7 flex flex-wrap gap-2" aria-label="Creator deliverables">
             {items.map(({ label, icon: Icon }) => (
               <li
                 key={label}
@@ -54,7 +54,7 @@ export default function CreatorHookStrip() {
           </ul>
         ) : (
           <motion.ul
-            className="mt-8 flex flex-wrap gap-2.5"
+            className="mt-7 flex flex-wrap gap-2"
             aria-label="Creator deliverables"
             variants={staggerFast}
             initial="hidden"

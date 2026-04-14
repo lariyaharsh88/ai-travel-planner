@@ -20,19 +20,19 @@ export default function HowItWorksIntro() {
   return (
     <div className="max-w-xl">
       <p className="type-eyebrow">Flow</p>
-      <div className="mt-3 h-px w-10 rounded-full bg-gradient-to-r from-[#c2410c]/60 to-stone-300/40" aria-hidden />
-      <h2 id="how-it-works-heading" className="type-display-lg mt-6 text-balance">
+      <div className="mt-3 h-px w-8 rounded-full bg-gradient-to-r from-[#c2410c]/55 to-transparent" aria-hidden />
+      <h2 id="how-it-works-heading" className="type-display-lg mt-5 text-balance">
         From one brief to a complete dossier
       </h2>
-      <p className="type-body-muted mt-5 max-w-[40ch]">
-        No tab-hopping. The same run produces itinerary, map, budget, and — when you want it — creator-ready assets.
+      <p className="type-body-muted mt-3 max-w-[40ch]">
+        One run: itinerary, map, budget, and optional creator assets — no tool-hopping.
       </p>
 
-      <ol className="mt-10 grid gap-4 sm:grid-cols-3 sm:gap-5">
+      <ol className="mt-8 grid gap-3 sm:grid-cols-3 sm:gap-4">
         {steps.map((s) => (
           <li
             key={s.n}
-            className="relative overflow-hidden rounded-2xl border border-stone-200/90 bg-white/70 p-5 shadow-[0_1px_0_rgba(15,23,42,0.04)] ring-1 ring-black/[0.02] backdrop-blur-sm"
+            className="relative overflow-hidden rounded-2xl border border-stone-200/60 bg-white/80 p-4 shadow-[0_1px_0_rgba(15,23,42,0.03)] sm:p-5"
           >
             <p className="font-mono text-[10px] font-medium tabular-nums tracking-[0.2em] text-stone-400">{s.n}</p>
             <p className="mt-3 text-[0.9375rem] font-medium tracking-tight text-stone-900">{s.title}</p>

@@ -12,28 +12,28 @@ export const enterTransition: Transition = {
 };
 
 export const enterSoftTransition: Transition = {
-  duration: 0.72,
+  duration: 0.78,
   ease: EASE_APPLE_SOFT,
 };
 
 /** Section list items — soft, less motion sickness */
 export const sectionItemTransition: Transition = {
-  duration: 0.68,
+  duration: 0.74,
   ease: EASE_APPLE_SOFT,
 };
 
 /** Micro-interaction spring — crisp but not bouncy */
 export const springTap: Transition = {
   type: "spring",
-  stiffness: 480,
-  damping: 42,
-  mass: 0.88,
+  stiffness: 520,
+  damping: 44,
+  mass: 0.85,
 };
 
 export const springGentle: Transition = {
   type: "spring",
-  stiffness: 280,
-  damping: 36,
+  stiffness: 320,
+  damping: 40,
 };
 
 /** Page / column — stagger children (Airbnb-style reveals) */
@@ -41,26 +41,26 @@ export const staggerPage: Variants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
-    transition: { staggerChildren: 0.09, delayChildren: 0.08, when: "beforeChildren" },
+    transition: { staggerChildren: 0.072, delayChildren: 0.1, when: "beforeChildren" },
   },
 };
 
 export const fadeSlideUp: Variants = {
-  hidden: { opacity: 0, y: 16 },
+  hidden: { opacity: 0, y: 12 },
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.62, ease: EASE_APPLE_SOFT },
+    transition: { duration: 0.7, ease: EASE_APPLE_SOFT },
   },
 };
 
 /** Short list stagger (cards, chips) */
 export const staggerFast: Variants = {
   hidden: {},
-  visible: { transition: { staggerChildren: 0.055, delayChildren: 0.04 } },
+  visible: { transition: { staggerChildren: 0.048, delayChildren: 0.05 } },
 };
 
 export const fadeInItem: Variants = {
-  hidden: { opacity: 0, y: 8 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.45, ease: EASE_APPLE_SOFT } },
+  hidden: { opacity: 0, y: 6 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.52, ease: EASE_APPLE_SOFT } },
 };

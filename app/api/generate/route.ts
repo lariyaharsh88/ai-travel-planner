@@ -388,6 +388,12 @@ function normalizeResponse(data: unknown, destination: string): TravelPlanRespon
     throw new Error("Invalid response format");
   }
 
+  const totalTripCostRaw = parsed.budgetBreakdown.totalTripCost;
+  let totalTripCost =
+    typeof totalTripCostRaw === "string" && totalTripCostRaw.trim().length > 0
+      ? totalTripCostRaw.trim()
+      : undefined;
+
   const seoSections = Array.isArray(parsed.blogContent.seoSections)
     ? parsed.blogContent.seoSections
         .map((s) => normalizeBlogSection(s))
@@ -395,6 +401,11 @@ function normalizeResponse(data: unknown, destination: string): TravelPlanRespon
     : undefined;
 
   const dayWisePlan = parsed.dayWisePlan.map((d) => normalizeDayPlan(d, destination));
+
+  if (!totalTripCost) {
+    totalTripCost =
+      "Full trip (INR): add each day’s estimatedDayCost to your stay line — use food/transport rows for the rest.";
+  }
 
   const reelIdeas = parsed.reelIdeas
     .map(normalizeReelIdea)
@@ -412,7 +423,12 @@ function normalizeResponse(data: unknown, destination: string): TravelPlanRespon
 
   return {
     dayWisePlan,
-    budgetBreakdown: parsed.budgetBreakdown,
+    budgetBreakdown: {
+      stay: parsed.budgetBreakdown.stay,
+      food: parsed.budgetBreakdown.food,
+      transport: parsed.budgetBreakdown.transport,
+      totalTripCost,
+    },
     reelIdeas,
     instagramSpots,
     photoAngles,
@@ -482,7 +498,8 @@ PRIMARY OUTPUT — REAL-WORLD ITINERARY (this is what matters):
    - One scam/pitfall or common rip-off to avoid at THIS place (if none, say "No common scam here — still pay metered auto / use official counter only").
    Also include "localInsight" on every stop: one hyper-specific detail (named dish, stall, price band, or neighbourhood habit).
 7) TOTAL DAILY COST: Each day MUST include "estimatedDayCost": one line in INR totalling that day's stops + legs (exclude hotel for multi-day unless you explicitly fold a night stay into that day).
-8) TRAVEL BETWEEN STOPS: For every consecutive pair of stops, one "travelLeg" (length = schedule.length - 1). Each leg MUST include:
+8) TRIP TOTAL: "budgetBreakdown" MUST include "totalTripCost": one line in INR for the whole trip (stay + food + local transport + activities + intercity as applicable), as a realistic range (e.g. "₹42,000–₹48,000 total trip") that roughly matches the sum of per-day "estimatedDayCost" lines + stay allocation.
+9) TRAVEL BETWEEN STOPS: For every consecutive pair of stops, one "travelLeg" (length = schedule.length - 1). Each leg MUST include:
    - "duration" — realistic total time (e.g. "~35 min" including wait).
    - "distance" — distance in km or metres for walks, e.g. "~4.2 km" or "~650 m walk".
    - "mode" — PRIMARY mode for this leg: one of "Walk", "Auto", "App cab", "Metro", "Bus", "Bike rental", "Ferry", "Train" (pick what fits).
@@ -528,7 +545,7 @@ Return ONLY valid JSON (no markdown, no commentary) with this schema:
       ]
     }
   ],
-  "budgetBreakdown": { "stay": "string", "food": "string", "transport": "string" },
+  "budgetBreakdown": { "stay": "string", "food": "string", "transport": "string", "totalTripCost": "₹X–Y total trip (all days + stay)" },
   "reelIdeas": [{ "hook": "string", "script": "string", "caption": "string", "hashtags": ["#a"] }],
   "instagramSpots": [{ "place": "string", "whyItWorks": "string", "bestTime": "string", "shotIdea": "string", "mapsLink": "https://..." }],
   "photoAngles": [{ "spot": "string", "shotType": "Wide | Drone | POV", "angle": "string", "composition": "string", "lighting": "string" }],
@@ -539,7 +556,7 @@ Return ONLY valid JSON (no markdown, no commentary) with this schema:
   }
 }
 
-Hard rules: travelLegs.length === schedule.length - 1 per day. "instagramSpots" and "photoAngles" arrays must exist. Every "reelIdeas" item MUST include "script". "blogContent.seoSections" MUST have 3–5 sections. Two "hiddenGem": true per day when schedule has ≥2 stops.
+Hard rules: travelLegs.length === schedule.length - 1 per day. "budgetBreakdown.totalTripCost" is REQUIRED. "instagramSpots" and "photoAngles" arrays must exist. Every "reelIdeas" item MUST include "script". "blogContent.seoSections" MUST have 3–5 sections. Two "hiddenGem": true per day when schedule has ≥2 stops.
 `.trim();
 
     const model = process.env.GROQ_MODEL ?? "llama-3.1-8b-instant";
@@ -557,15 +574,15 @@ Hard rules: travelLegs.length === schedule.length - 1 per day. "instagramSpots" 
             role: "system",
             content:
               planMode === "creator"
-                ? "You are a local expert trip planner for India + worldwide. Output ONLY valid JSON. No markdown. Prioritize a hyper-practical day-by-day schedule: exact timeSlots, INR costs, travel legs with km + time + mode + alternatives, two real hidden gems per day, and insider tips (crowd, entry, scams). Then fill creator fields. Reject generic travel-blog filler."
-                : "You are a local expert trip planner. Output ONLY valid JSON. No markdown. Every day: exact timeSlots (e.g. 9:00 AM – 11:00 AM), INR per activity, legs with km/duration/mode/alternatives, total daily cost, two hidden gems per day, and insider tips (crowd, entry, scams). Then a lighter creator kit. Reject vague language.",
+                ? "You are a local expert trip planner for India + worldwide. Output ONLY valid JSON. No markdown. Prioritize a hyper-practical day-by-day schedule: exact timeSlots, INR costs, travel legs with km + time + mode + alternatives, two real hidden gems per day, and insider tips (crowd, entry, scams). budgetBreakdown.totalTripCost must reconcile with per-day spend + stay. Then fill creator fields. Reject generic travel-blog filler."
+                : "You are a local expert trip planner. Output ONLY valid JSON. No markdown. Every day: exact timeSlots (e.g. 9:00 AM – 11:00 AM), INR per activity, legs with km/duration/mode/alternatives, total daily cost, two hidden gems per day, insider tips (crowd, entry, scams), and budgetBreakdown.totalTripCost. Then a lighter creator kit. Reject vague language.",
           },
           {
             role: "user",
             content: prompt,
           },
         ],
-        temperature: 0.38,
+        temperature: 0.32,
       }),
     });
 

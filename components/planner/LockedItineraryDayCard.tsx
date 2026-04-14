@@ -25,10 +25,11 @@ export default function LockedItineraryDayCard({ dayPlan, onUnlock }: LockedItin
       <div className="relative px-5 py-5 sm:px-6 sm:py-6">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
-            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#c2410c]/80">
-              Day {dayPlan.day}
-            </p>
-            <h4 className="mt-1 text-base font-semibold text-stone-900 sm:text-lg">{dayPlan.title}</h4>
+            <h4 className="text-base font-semibold tracking-tight text-stone-900 sm:text-lg">
+              <span className="text-stone-500">Day {dayPlan.day}</span>
+              <span className="text-stone-300"> · </span>
+              {dayPlan.title}
+            </h4>
             <p className="mt-2 text-xs text-stone-500">
               {stopCount} stop{stopCount === 1 ? "" : "s"} · full times, legs & tips in Premium
             </p>

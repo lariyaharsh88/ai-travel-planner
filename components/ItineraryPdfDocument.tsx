@@ -416,6 +416,8 @@ export default function ItineraryPdfDocument({
       {/* Cover */}
       <Page size="A4" style={{ padding: 0 }}>
         <View style={styles.coverPage}>
+          {/* @react-pdf/renderer Image does not support `alt`; cover is decorative in PDF */}
+          {/* eslint-disable-next-line jsx-a11y/alt-text */}
           <Image style={styles.coverImage} src={coverSrc} />
           <View style={styles.coverScrim} />
           <View style={styles.coverInner}>
@@ -451,10 +453,31 @@ export default function ItineraryPdfDocument({
             <Text style={styles.budgetLabel}>Food</Text>
             <Text style={styles.budgetValue}>{result.budgetBreakdown.food}</Text>
           </View>
-          <View style={styles.budgetRowLast}>
+          <View style={styles.budgetRow}>
             <Text style={styles.budgetLabel}>Transport</Text>
             <Text style={styles.budgetValue}>{result.budgetBreakdown.transport}</Text>
           </View>
+          {result.dayWisePlan.map((d) =>
+            d.estimatedDayCost ? (
+              <View key={`pdf-day-${d.day}`} style={styles.budgetRow}>
+                <Text style={styles.budgetLabel}>{`Day ${d.day}`}</Text>
+                <Text style={styles.budgetValue}>{d.estimatedDayCost}</Text>
+              </View>
+            ) : null,
+          )}
+          {result.budgetBreakdown.totalTripCost ? (
+            <View style={styles.budgetRowLast}>
+              <Text style={styles.budgetLabel}>Trip total</Text>
+              <Text style={[styles.budgetValue, { color: ink, fontFamily: "Helvetica-Bold" }]}>
+                {result.budgetBreakdown.totalTripCost}
+              </Text>
+            </View>
+          ) : (
+            <View style={styles.budgetRowLast}>
+              <Text style={styles.budgetLabel}>Trip total</Text>
+              <Text style={styles.budgetValue}>See day lines + categories above</Text>
+            </View>
+          )}
         </View>
       </Page>
 

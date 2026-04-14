@@ -15,7 +15,7 @@ function getTodayKey() {
 }
 
 function normalizeAndPersist(parsed: Partial<UsageState>, today: string): UsageState {
-  let freeUsed = parsed.freeUsed ?? 0;
+  const freeUsed = parsed.freeUsed ?? 0;
   let paidCredits = parsed.paidCredits ?? 0;
   let premiumUnlocked = parsed.premiumUnlocked === true;
 

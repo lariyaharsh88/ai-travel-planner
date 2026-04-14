@@ -15,8 +15,8 @@
   /** iOS home indicator + fixed chrome */
   --safe-top: env(safe-area-inset-top, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
-  --shadow-card: 0 1px 0 rgba(15, 23, 42, 0.04), 0 20px 48px -28px rgba(15, 23, 42, 0.09);
-  --shadow-card-hover: 0 28px 64px -32px rgba(15, 23, 42, 0.12);
+  --shadow-card: 0 1px 0 rgba(15, 23, 42, 0.035), 0 18px 44px -30px rgba(15, 23, 42, 0.075);
+  --shadow-card-hover: 0 24px 56px -34px rgba(15, 23, 42, 0.11);
   --glass-bg: rgba(255, 255, 255, 0.68);
   --glass-border: rgba(255, 255, 255, 0.55);
 }
@@ -118,32 +118,32 @@ body {
   .type-eyebrow {
     font-size: 0.6875rem;
     font-weight: 600;
-    letter-spacing: 0.2em;
+    letter-spacing: 0.18em;
     text-transform: uppercase;
     color: rgb(120 113 108);
   }
 
   .type-display {
-    font-size: clamp(1.5rem, 2.4vw, 1.95rem);
+    font-size: clamp(1.5rem, 2.35vw, 1.9rem);
     font-weight: 300;
-    letter-spacing: -0.035em;
-    line-height: 1.18;
+    letter-spacing: -0.032em;
+    line-height: 1.2;
     color: rgb(28 25 23);
   }
 
   /** Slightly larger — primary page titles only */
   .type-display-lg {
-    font-size: clamp(1.625rem, 2.65vw, 2.125rem);
+    font-size: clamp(1.6rem, 2.6vw, 2.05rem);
     font-weight: 300;
-    letter-spacing: -0.038em;
-    line-height: 1.14;
+    letter-spacing: -0.036em;
+    line-height: 1.12;
     color: rgb(28 25 23);
   }
 
   .type-body-muted {
     font-size: 0.9375rem;
-    line-height: 1.68;
-    color: rgb(87 83 78);
+    line-height: 1.62;
+    color: rgb(100 96 91);
   }
 
   .section-y {

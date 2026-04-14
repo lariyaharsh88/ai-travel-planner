@@ -23,7 +23,7 @@ export default function ItineraryDayCard({
   isPremiumOutput = true,
 }: ItineraryDayCardProps) {
   const [open, setOpen] = useState(defaultOpen);
-  const { whileHover, whileTap } = useCardHoverMotion(5);
+  const { whileHover, whileTap } = useCardHoverMotion(3);
   const dest = destination.trim() || "India";
   const dayCoverPlace = dayPlan.schedule[0]?.place ?? dest;
 
@@ -56,14 +56,20 @@ export default function ItineraryDayCard({
         aria-expanded={open}
       >
         <div className="min-w-0">
-          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#c2410c]">Day {dayPlan.day}</p>
-          <h4 className="mt-1 truncate text-base font-semibold text-stone-900 sm:text-lg">{dayPlan.title}</h4>
+          <h4 className="truncate text-base font-semibold tracking-tight text-stone-900 sm:text-lg">
+            <span className="text-stone-500">Day {dayPlan.day}</span>
+            <span className="text-stone-300"> · </span>
+            {dayPlan.title}
+          </h4>
           {dayPlan.estimatedDayCost ? (
             <p className="mt-1.5 line-clamp-2 text-xs font-medium leading-snug text-stone-600">
               {isPremiumOutput ? (
                 <>Day estimate: {dayPlan.estimatedDayCost}</>
               ) : (
-                <>Day estimate: <span className="text-stone-400">Unlock Premium for full breakdown</span></>
+                <>
+                  Day estimate:{" "}
+                  <span className="text-stone-400">Unlock for full day-wise breakdown</span>
+                </>
               )}
             </p>
           ) : null}
@@ -83,7 +89,7 @@ export default function ItineraryDayCard({
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.45, ease: EASE_APPLE }}
+            transition={{ duration: 0.5, ease: EASE_APPLE }}
             className="border-t border-stone-100"
           >
             <div className="space-y-5 px-4 py-5 sm:px-5 sm:py-6">
